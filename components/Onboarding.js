@@ -118,7 +118,7 @@ const Next = props =>(
       <ScrollView style={styles.difDishContainer}>
       {props.data}
       </ScrollView>
-     
+      
     </View> 
   </View>);
 

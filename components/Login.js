@@ -41,7 +41,7 @@ export default function Login() {
     </View> 
   </View>
     )
-}
+} 
 const styles = StyleSheet.create({
    loginBg: {
     width: responsiveWidth(100),
