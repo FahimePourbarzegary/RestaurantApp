@@ -17,21 +17,25 @@ import {
 } from 'react-native-responsive-dimensions';
 
 import categoryFoodList from '../../assets/data/Specialdata/categoryFoodList.js';
-
+{/*import { SwipeListView } from 'react-native-swipe-list-view';*/}
+import { SwipeListView } from 'react-native-swipe-list-view';
 export default function CardProductBox() {
   return (
     <View
       style={styles.ContainerAlldata}>
-      <FlatList
+      <SwipeListView
         data={categoryFoodList}
         renderItem={renderCardProducts}
-        keyExtractor={item => item.id}
+        renderHiddenItem={renderHiddenItem}
+        leftOpenValue={0} 
+        rightOpenValue={-75}
       />
+      
     </View>
   );
 }
-const renderCardProducts = ({item}) => {
-  const rightButtons = [
+  const renderHiddenItem = (data, rowMap)=>{
+    return(
     <TouchableOpacity style={styles.trashContainer}>
       <View style={styles.trashLoc}>
         <Image
@@ -39,10 +43,12 @@ const renderCardProducts = ({item}) => {
           style={{width: responsiveWidth(3), height: responsiveHeight(3)}}
         />
       </View>
-    </TouchableOpacity>,
-  ];
-  return (
+    </TouchableOpacity>)}
     
+const renderCardProducts = ({item}) => {
+
+  return (
+  
       <View style={styles.ContainerCategoryBox}>
         <View style={{flexDirection: 'row'}}>
           <View style={styles.imageContainer}></View>
@@ -155,7 +161,7 @@ const styles = StyleSheet.create({
   },
   trashContainer: {
     marginTop: responsiveHeight(5),
-    marginLeft: responsiveWidth(3),
+    marginLeft: responsiveWidth(70),
   },
   trashLoc: {
     width: responsiveWidth(12),
@@ -164,6 +170,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 50,
+    shadowColor:'gray',
+    elevation:5,
   },
   ContainerAlldata:{
   width: responsiveWidth(85),
