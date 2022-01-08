@@ -20,8 +20,9 @@ import {Shadow} from 'react-native-shadow-2';
 import Button from '../Button/Button.js';
 import LinearGradient from 'react-native-linear-gradient';
 
-export default function Profile(props, {navigation}) {
- 
+export default function Profile(props, {navigation},route) {
+  
+  
   const profile = [
     {
       id: '1',
@@ -49,7 +50,12 @@ export default function Profile(props, {navigation}) {
       <View>
         <Text style={styles.titleProfile}>{detail.title}</Text>
         <Text style={styles.textProfile}>{detail.text}</Text>
-        <TouchableOpacity style={styles.inputIcon}>
+        <TouchableOpacity style={styles.inputIcon}
+        onPress={() =>
+            props.navigation.navigate("Edit", {
+              text:detail.text,
+              title:detail.title,
+              })}>
           <FontAwesomeIcon icon={faPlus} color="#6B6B6B" size={20} />
         </TouchableOpacity>
       </View>
@@ -76,11 +82,11 @@ export default function Profile(props, {navigation}) {
             style={styles.inputImage}
             source={require('../../assets/images/onboarding/DifDish/burger.png')}
           />
-          <TouchableOpacity style={styles.inputImageIcon}>
+          <TouchableOpacity style={styles.inputImageIcon} onPress={()=>props.navigation.navigate("ImagePicker")}>
             <FontAwesomeIcon icon={faPlus} color="#6B6B6B" />
           </TouchableOpacity>
         </View>
-        <View style={styles.TextContainer}>
+        <View style={styles.TextContainer}> 
           <Text style={styles.Text}>My Profile</Text>
         </View>
         <View style={styles.text}>
