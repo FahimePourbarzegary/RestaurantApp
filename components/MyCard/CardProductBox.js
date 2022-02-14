@@ -1,85 +1,121 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Image,
-  SafeAreaView,
-  ScrollView,
-  Animated,
+  Alert,
 } from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import {SwipeListView} from 'react-native-swipe-list-view';
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import {faCheckCircle} from '@fortawesome/free-regular-svg-icons';
+import axios from 'axios';
+export default function CardProductBox(props, {navigation}) {
+  const deleteCardbyid = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/Card/deleteCard', state)
+        .then(res => res.data)
+        .then(data => {
+          console.log(data);
+          Alert.alert('Delete From your card');
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const Delete = idfood => {
+    ClickDelete(idfood);
+  };
+  const ClickDelete = idfood => {
+    const state = {
+      id: idfood,
+      user_id: props.userid,
+    };
+    deleteCardbyid(state);
+  };
 
-import categoryFoodList from '../../assets/data/Specialdata/categoryFoodList.js';
-{/*import { SwipeListView } from 'react-native-swipe-list-view';*/}
-import { SwipeListView } from 'react-native-swipe-list-view';
-export default function CardProductBox() {
+  const closeRow = (rowMap, rowKey) => {
+    if (rowMap[rowKey]) {
+      rowMap[rowKey].closeRow();
+    }
+  };
+  const deleteRow = (rowMap, rowKey) => {
+    closeRow(rowMap, rowKey);
+    const newData = [...props.FoodData];
+    const prevIndex = listData.findIndex(item => item.key === rowKey);
+    newData.splice(prevIndex, 1);
+    setFoodData(newData);
+  };
+  const renderHiddenItem = (data, rowMap) => {
+    console.log(data);
+    return (
+      <TouchableOpacity
+        style={styles.trashContainer}
+        onPress={() => {
+          Delete(data.item.id);
+          setTimeout(() => {
+            props.FuncShow();
+          }, 1000);
+        }}>
+        <View style={styles.trashLoc}>
+          <Image
+            source={require('../../assets/images/Other/trash.png')}
+            style={{
+              marginTop: responsiveHeight(1),
+              width: responsiveWidth(4),
+              height: responsiveHeight(4),
+            }}
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
-    <View
-      style={styles.ContainerAlldata}>
+    <View style={styles.ContainerAlldata}>
       <SwipeListView
-        data={categoryFoodList}
+        data={props.FoodData}
         renderItem={renderCardProducts}
         renderHiddenItem={renderHiddenItem}
-        leftOpenValue={0} 
+        leftOpenValue={0}
         rightOpenValue={-75}
+        showsVerticalScrollIndicator={false}
       />
-      
     </View>
   );
 }
-  const renderHiddenItem = (data, rowMap)=>{
-    return(
-    <TouchableOpacity style={styles.trashContainer}>
-      <View style={styles.trashLoc}>
-        <Image
-          source={require('../../assets/images/Other/trash.png')}
-          style={{width: responsiveWidth(3), height: responsiveHeight(3)}}
-        />
-      </View>
-    </TouchableOpacity>)}
-    
-const renderCardProducts = ({item}) => {
 
+const renderCardProducts = ({item}) => {
   return (
-  
-      <View style={styles.ContainerCategoryBox}>
-        <View style={{flexDirection: 'row'}}>
-          <View style={styles.imageContainer}></View>
-          <View style={styles.foodDetail}>
-            <Text
-              style={styles.nameStyleText}>
-              {item.name}
-            </Text>
-            <Text
-              style={styles.compositionsStyleText}>
-              {item.compositions}
-            </Text>
-            <Text
-              style={styles.priceStyleText}>
-              ${item.price}
-            </Text>
-          </View>
-          <View style={styles.quantityContainer}>
-            <View style={styles.quantity}>
-              <Text style={styles.numquantity}>2</Text>
-            </View>
-            <TouchableOpacity style={styles.plusContainer}>
-              <Text style={styles.plus}>+</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.minusContainer}>
-              <Text style={styles.minus}>-</Text>
-            </TouchableOpacity>
+    <View style={styles.ContainerCategoryBox}>
+      <View style={{flexDirection: 'row'}}>
+        <View></View>
+
+        <View style={styles.foodDetail}>
+          <Text style={styles.nameStyleText}>
+            {item.name}
+            {item.condition == 'endbuy' ? (
+              <FontAwesomeIcon icon={faCheckCircle} color="gray" size={22} />
+            ) : null}
+          </Text>
+          <Text style={styles.compositionsStyleText}>{item.compositions}</Text>
+
+          <Text style={styles.priceStyleText}>${item.price}</Text>
+        </View>
+        <View style={styles.quantityContainer}>
+          <View style={styles.quantity}>
+            <Text style={styles.numquantity}>{item.number}</Text>
           </View>
         </View>
       </View>
-
+    </View>
   );
 };
 const styles = StyleSheet.create({
@@ -89,6 +125,8 @@ const styles = StyleSheet.create({
     marginBottom: responsiveHeight(4),
     backgroundColor: '#FAFBFD',
     borderRadius: 10,
+    shadowColor: '#0009',
+    elevation: 10,
   },
 
   imageContainer: {
@@ -104,12 +142,13 @@ const styles = StyleSheet.create({
     marginTop: responsiveHeight(3),
   },
   quantityContainer: {
+    position: 'absolute',
     flexDirection: 'row',
     marginTop: responsiveHeight(3),
-    marginLeft: responsiveWidth(8),
+    marginLeft: responsiveWidth(60),
   },
   quantity: {
-    backgroundColor: '#FAFBFD',
+    backgroundColor: '#F4F4F4',
     width: responsiveWidth(20),
     height: responsiveHeight(10),
     justifyContent: 'center',
@@ -144,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: 'center',
     shadowColor: '#0009',
-    elevation: 4,
+    elevation: 4, 
   },
   minusContainer: {
     position: 'absolute',
@@ -164,35 +203,39 @@ const styles = StyleSheet.create({
     marginLeft: responsiveWidth(70),
   },
   trashLoc: {
-    width: responsiveWidth(12),
+    width: responsiveWidth(11),
     height: responsiveHeight(6),
     backgroundColor: '#272727',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 50,
-    shadowColor:'gray',
-    elevation:5,
+    borderRadius: 60,
+    shadowColor: 'gray',
+    elevation: 5,
   },
-  ContainerAlldata:{
-  width: responsiveWidth(85),
-  height: responsiveHeight(55),
-  marginLeft: responsiveWidth(8),
-  marginTop: responsiveHeight(3),
-   },
-  nameStyleText:{
+  ContainerAlldata: {
+    width: responsiveWidth(85),
+    height: responsiveHeight(55),
+    marginLeft: responsiveWidth(8),
+    marginTop: responsiveHeight(3),
+  },
+  nameStyleText: {
     fontFamily: 'Gilroy-Regular',
     color: '#272727',
     fontSize: responsiveFontSize(2.2),
   },
-  compositionsStyleText:{
-  fontFamily: 'Gilroy-Medium',
-  color: '#9C9C9C',
-  fontSize: responsiveFontSize(1.5),
+  compositionsStyleText: {
+    fontFamily: 'Gilroy-Medium',
+    color: '#9C9C9C',
+    fontSize: responsiveFontSize(1.5),
   },
-  priceStyleText:{
-  fontFamily: 'Gilroy-Medium',
-  color: '#313131',
-  fontSize: responsiveFontSize(2.5),
-  marginTop: responsiveHeight(1),
+  priceStyleText: {
+    fontFamily: 'Gilroy-Medium',
+    color: '#313131',
+    fontSize: responsiveFontSize(2.5),
+    marginTop: responsiveHeight(1),
+    marginRight: responsiveWidth(3),
+  },
+  iconStyleWrong: {
+    position: 'absolute',
   },
 });

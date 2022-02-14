@@ -3,13 +3,13 @@ import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
-  responsiveFontSize,
+  responsiveFontSize, 
 } from 'react-native-responsive-dimensions';
 /* component button for buy*/
-export default function BuyNowButton() {
-  return (
+export default function BuyNowButton(props) {
+  return ( 
     <>
-      <TouchableOpacity style={styles.Button}>
+      <TouchableOpacity style={styles.Button} onPress={props.nav}>
         <Text style={styles.text}>Buy Now</Text>
         <View style={styles.iconContainer}>
           <Image
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     borderWidth: 2,
     marginTop: responsiveHeight(5),
-    marginLeft: responsiveWidth(43),
+    marginLeft: responsiveWidth(25),
     flexDirection: 'row',
     shadowColor: 'gray',
     elevation: 15,

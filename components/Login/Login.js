@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,101 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSignInAlt} from '@fortawesome/free-solid-svg-icons';
 import {
+  faTimesCircle,
+  faCheckCircle,
+} from '@fortawesome/free-regular-svg-icons';
+import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
 import LinearGradient from 'react-native-linear-gradient';
-export default function Login(props, {navigation}) {
+//Redux
+import axios from 'axios';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+//..
+function Login(props, {navigation}) {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const [userToken, setuserToken] = useState('false');
+  const [checkLogin, setCheckLogin] = useState(null);
+  const [styleAuthU, setStyleAuthU] = useState(true);
+  const [styleAuthP, setStyleAuthP] = useState(true);
+  const [styleAuthC, setStyleAuthC] = useState(false);
+  const [userData, setUserData] = useState([{}]);
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('user')
+        .then(data => data)
+        .then(value => {
+          setUserData(value);
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const StoreData = async user => {
+    try {
+      const jsonValue = JSON.stringify(user);
+      await AsyncStorage.setItem('@user_info', jsonValue);
+      console.log(JSON.stringify(user));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const Set_userToken = async userToken => {
+    try {
+      await AsyncStorage.setItem('@userToken', 'TRUE');
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {}, []);
+  const AuthUser = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/User/AuthUser', state)
+        .then(res => res.data)
+        .then(data => {
+          setUserData(userData => data);
+          if (data[0].id == 999999999) {
+            setStyleAuthU(false);
+            setStyleAuthP(true);
+            setStyleAuthC(false);
+          } else if (data[0].id == 999999998) {
+            setStyleAuthP(false);
+            setStyleAuthU(true);
+            setStyleAuthC(true);
+          } else {
+            setStyleAuthU(true);
+            setStyleAuthP(true);
+            setStyleAuthC(true);
+            Set_userToken();
+            StoreData(data[0]);
+            props.navigation.navigate('Special');
+          }
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const Submit = () => {
+    ClickAuth();
+  };
+  const ClickAuth = () => {
+    const state = {
+      username: userName,
+      password: password,
+    };
+    AuthUser(state);
+  };
+
   return (
     <View>
       <View>
@@ -40,23 +127,67 @@ export default function Login(props, {navigation}) {
           <Text style={styles.Text}>Login</Text>
         </View>
         <View style={styles.textInputeContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={val => setUserName(val)}
-            placeholder="Username"
-          />
-          <TextInput
-            style={styles.input}
-            onChangeText={val => setPassword(val)}
-            placeholder="Password"
-            secureTextEntry={true}
-          />
+          <View>
+            <TextInput
+              style={[
+                styles.input,
+                styleAuthU ? null : {borderColor: 'red', borderWidth: 2},
+              ]}
+              onChangeText={value => {
+                setUserName(value);
+              }}
+              placeholder="Username"
+            />
+            {styleAuthU ? (
+              styleAuthC ? (
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  color="gray"
+                  style={styles.iconStyleWrong}
+                  size={22}
+                />
+              ) : null
+            ) : (
+              <FontAwesomeIcon
+                icon={faTimesCircle}
+                color="red"
+                style={styles.iconStyleWrong}
+                size={22}
+              />
+            )}
+          </View>
+          <View>
+            <TextInput
+              style={[
+                styles.input,
+                styleAuthP ? null : {borderColor: 'red', borderWidth: 2},
+              ]}
+              onChangeText={value => {
+                setPassword(value);
+              }}
+              placeholder="Password"
+              secureTextEntry={true}
+            />
+            {styleAuthP ? (
+              styleAuthC ? (
+                <FontAwesomeIcon
+                  icon={faCheckCircle}
+                  color="gray"
+                  style={styles.iconStyleWrong}
+                  size={22}
+                />
+              ) : null
+            ) : (
+              <FontAwesomeIcon
+                icon={faTimesCircle}
+                color="red"
+                style={styles.iconStyleWrong}
+                size={22}
+              />
+            )}
+          </View>
         </View>
-        <TouchableOpacity
-          style={styles.Button}
-          onPress={() => {
-            props.navigation.navigate('Special');
-          }}>
+        <TouchableOpacity style={styles.Button} onPress={() => Submit()}>
           <Text
             style={{
               color: 'white',
@@ -78,37 +209,12 @@ export default function Login(props, {navigation}) {
           </TouchableOpacity>
         </View>
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.Signup}>I don`t ForgotPassword.</Text>
+          <Text style={styles.Signup}>I ForgotPassword.</Text>
           <TouchableOpacity
             onPress={() => {
               props.navigation.navigate('ForgotPassword');
             }}>
             <Text style={styles.sign}>ForgotPassword</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.difaccount}>You can access with</Text>
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity style={styles.facebook}>
-            <Text
-              style={{
-                color: 'white',
-                textAlign: 'center',
-                fontFamily: 'Avenir Heavy',
-                fontSize: responsiveFontSize(2.5),
-              }}>
-              Facebook
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.google}>
-            <Text
-              style={{
-                color: 'white',
-                textAlign: 'center',
-                fontFamily: 'Avenir Heavy',
-                fontSize: responsiveFontSize(2.5),
-              }}>
-              Google
-            </Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -234,4 +340,11 @@ const styles = StyleSheet.create({
     marginTop: responsiveHeight(1),
     marginLeft: responsiveWidth(0.2),
   },
+  iconStyleWrong: {
+    position: 'absolute',
+    marginTop: responsiveHeight(6.5),
+    marginLeft: responsiveWidth(75),
+  },
 });
+
+export default Login;

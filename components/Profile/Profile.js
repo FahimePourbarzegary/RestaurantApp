@@ -1,13 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  TextInput,
   ScrollView,
-  FlatList,
+  Alert,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPlus, faTimes} from '@fortawesome/free-solid-svg-icons';
@@ -16,33 +15,126 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import {Shadow} from 'react-native-shadow-2';
 import Button from '../Button/Button.js';
 import LinearGradient from 'react-native-linear-gradient';
+//.. 
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+//..
+function Profile(props, {navigation}, route) {
+  const [userData, setUserData] = useState('df');
 
-export default function Profile(props, {navigation},route) {
-  
-  
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@user_info')
+        .then(data => data)
+        .then(value => {
+          setUserData(JSON.parse(value));
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const UpdateUser = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/User/UpdateUser', state)
+        .then(res => res.data)
+        .then(data => {
+          if (data[0].id == 999999998) {
+            Alert.alert('username has already exist');
+          } else if (data[0].id == 999999999) {
+            Alert.alert('phoneNumber has already exist');
+          } else {
+            removeData();
+            StoreData(data[0]);
+            getData();
+            props.navigation.navigate('MainMenu');
+          }
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const StoreData = async user => {
+    try {
+      const jsonValue = JSON.stringify(user);
+      await AsyncStorage.removeItem('@user_info');
+      await AsyncStorage.setItem('@user_info', jsonValue);
+      console.log(JSON.stringify(user));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const removeData = async () => {
+    try {
+      await AsyncStorage.removeItem('@user_info');
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+  const Submit = () => {
+    ClickUpdate();
+  };
+  const ClickUpdate = () => {
+    const state = {
+      id: userData.id,
+      username: userData.username,
+      email: userData.email,
+      phonenumber: userData.phonenumber,
+      password: userData.password,
+      image: userData.image,
+      address: userData.address,
+    };
+    UpdateUser(state);
+  };
+
+  const OnSelect = data => {
+    setUserData(Data => ({...Data, image: data}));
+  };
+  const EditText = (data, title) => {
+    if (title === 'username') {
+      setUserData(Data => ({...Data, username: data}));
+    } else if (title === 'phonenumber') {
+      setUserData(Data => ({...Data, phonenumber: data}));
+    } else if (title === 'email') {
+      setUserData(Data => ({...Data, email: data}));
+    } else if (title === 'address') {
+      setUserData(Data => ({...Data, address: data}));
+    } else {
+      console.log('error');
+    }
+  };
+
   const profile = [
     {
       id: '1',
+      type: 'username',
       title: 'Name Surname',
-      text: 'Thoney Asnton',
+      text: userData.username,
     },
     {
       id: '2',
+      type: 'phonenumber',
       title: 'Phone',
-      text: '+90 507 064 2850',
+      text: userData.phonenumber,
     },
     {
       id: '3',
+      type: 'email',
       title: 'Email',
-      text: 'mehmetozsoy1988@gmail.com',
+      text: userData.email,
     },
     {
       id: '4',
+      type: 'address',
       title: 'Address',
-      text: '241 Hillside Road, HASTINGS',
+      text: userData.address,
     },
   ];
   const renderProfiledetail = profile.map(detail => (
@@ -50,12 +142,16 @@ export default function Profile(props, {navigation},route) {
       <View>
         <Text style={styles.titleProfile}>{detail.title}</Text>
         <Text style={styles.textProfile}>{detail.text}</Text>
-        <TouchableOpacity style={styles.inputIcon}
-        onPress={() =>
-            props.navigation.navigate("Edit", {
-              text:detail.text,
-              title:detail.title,
-              })}>
+        <TouchableOpacity
+          style={styles.inputIcon}
+          onPress={() =>
+            props.navigation.navigate('Edit', {
+              type: detail.type,
+              text: detail.text,
+              title: detail.title,
+              EditText: EditText,
+            })
+          }>
           <FontAwesomeIcon icon={faPlus} color="#6B6B6B" size={20} />
         </TouchableOpacity>
       </View>
@@ -80,13 +176,17 @@ export default function Profile(props, {navigation},route) {
         <View style={{flexDirection: 'row'}}>
           <Image
             style={styles.inputImage}
-            source={require('../../assets/images/onboarding/DifDish/burger.png')}
+            source={{uri: 'data:image/jpeg;base64,' + userData.image}}
           />
-          <TouchableOpacity style={styles.inputImageIcon} onPress={()=>props.navigation.navigate("ImagePicker")}>
+          <TouchableOpacity
+            style={styles.inputImageIcon}
+            onPress={() =>
+              props.navigation.navigate('ImagePicker', {OnSelect: OnSelect})
+            }>
             <FontAwesomeIcon icon={faPlus} color="#6B6B6B" />
           </TouchableOpacity>
         </View>
-        <View style={styles.TextContainer}> 
+        <View style={styles.TextContainer}>
           <Text style={styles.Text}>My Profile</Text>
         </View>
         <View style={styles.text}>
@@ -112,7 +212,12 @@ export default function Profile(props, {navigation},route) {
             </View>
           </ScrollView>
           <View style={{position: 'absolute', bottom: 0}}>
-            <Button Text="Save" />
+            <Button
+              Text="Save"
+              nav={() => {
+                Submit();
+              }}
+            />
           </View>
         </View>
       </LinearGradient>
@@ -211,3 +316,5 @@ const styles = StyleSheet.create({
     marginTop: responsiveHeight(1.5),
   },
 });
+
+export default Profile;

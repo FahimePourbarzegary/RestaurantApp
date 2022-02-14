@@ -1,12 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  TextInput,
-  ScrollView,
   FlatList,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -16,10 +14,37 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import {Shadow} from 'react-native-shadow-2';
 import Button from '../Button/Button.js';
 import LinearGradient from 'react-native-linear-gradient';
-export default function MainMenu(props, {navigation}) {
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useFocusEffect} from '@react-navigation/native';
+function MainMenu(props, {navigation}) {
+  const [userData, setUserData] = useState('');
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@user_info')
+        .then(data => data)
+        .then(value => {
+          setUserData(JSON.parse(value));
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, [props.navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => getData();
+    }, [props.navigation]),
+  );
+
+  console.log(userData);
   nv = props.navigation;
   const renderMenudetail = ({item}) => {
     return (
@@ -28,7 +53,7 @@ export default function MainMenu(props, {navigation}) {
           <Text style={styles.title}>{item.title}</Text>
           <TouchableOpacity
             style={styles.Entri}
-            onPress={() => nv.navigate(item.nav)}>
+            onPress={() => nv.navigate(item.nav, {id: userData.id})}>
             <FontAwesomeIcon icon={faAngleRight} color="#AAAAAA" size={20} />
           </TouchableOpacity>
         </View>
@@ -46,11 +71,7 @@ export default function MainMenu(props, {navigation}) {
       title: 'Change Password',
       nav: 'ChangePassword',
     },
-    {
-      id: '3',
-      title: 'Payment Settings',
-      nav: 'Profile',
-    },
+
     {
       id: '5',
       title: 'My Card',
@@ -58,13 +79,18 @@ export default function MainMenu(props, {navigation}) {
     },
     {
       id: '6',
-      title: 'Food Delivery',
-      nav: 'Profile',
+      title: 'Food Compaign',
+      nav: 'FoodCompaigns',
     },
     {
       id: '7',
+      title: 'Favorites',
+      nav: 'Favorites',
+    },
+    {
+      id: '8',
       title: 'Filter Food',
-      nav: 'Profile',
+      nav: 'FoodFilter',
     },
   ]);
   return (
@@ -83,15 +109,17 @@ export default function MainMenu(props, {navigation}) {
           ' rgba(255, 255, 255, 30) 116.03%',
         ]}
         style={styles.bgWhite}>
-        <View style={styles.inputImage}></View>
+        <View>
+          <Image
+            style={styles.inputImage}
+            source={{uri: 'data:image/jpeg;base64,' + userData.image}}
+          />
+        </View>
         <View style={styles.TextContainer}>
-          <Text style={styles.Text}>Thoney Asnton</Text>
+          <Text style={styles.Text}>{userData.username}</Text>
         </View>
         <View style={styles.text}>
-          <Text
-            style={styles.numberStyleText}>
-            +90 507 064 2850
-          </Text>
+          <Text style={styles.numberStyleText}>{userData.phonenumber}</Text>
         </View>
         <TouchableOpacity
           style={styles.close}
@@ -105,7 +133,10 @@ export default function MainMenu(props, {navigation}) {
             keyExtractor={item => item.id}
           />
         </View>
-        <Button Text="Log out" />
+        <Button
+          Text="Log Out"
+          nav={() => props.navigation.navigate('Onboarding')}
+        />
       </LinearGradient>
     </View>
   );
@@ -183,9 +214,11 @@ const styles = StyleSheet.create({
   Entri: {
     marginLeft: responsiveWidth(85),
   },
-  numberStyleText:{
-  color: '#B0B0B0',
-  fontSize: responsiveFontSize(1.8),
-  fontFamily: 'Avenir_Medium',
+  numberStyleText: {
+    color: '#B0B0B0',
+    fontSize: responsiveFontSize(1.8),
+    fontFamily: 'Avenir_Medium',
   },
 });
+
+export default MainMenu;

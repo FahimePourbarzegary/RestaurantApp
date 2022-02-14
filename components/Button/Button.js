@@ -3,17 +3,14 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
-  responsiveFontSize,
+  responsiveFontSize,  
 } from 'react-native-responsive-dimensions';
 /*button component for setting in sevral screen*/
 export default function Button(props) {
   return (
     <View>
       <TouchableOpacity style={styles.Button} onPress={props.nav}>
-        <Text
-          style={styles.text}>
-          {props.Text}
-        </Text>
+        <Text style={styles.text}>{props.Text}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -34,10 +31,10 @@ const styles = StyleSheet.create({
     shadowColor: 'gray',
     elevation: 15,
   },
-  text:{
-            color: 'white',
-            textAlign: 'center',
-            fontFamily: 'Gilroy-Medium',
-            fontSize: responsiveFontSize(2.5),
-          },
+  text: {
+    color: 'white',
+    textAlign: 'center',
+    fontFamily: 'Gilroy-Medium',
+    fontSize: responsiveFontSize(2.5),
+  },
 });

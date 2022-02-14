@@ -1,17 +1,15 @@
-import React, {Component} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import React from 'react';
+import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faShoppingBag} from '@fortawesome/free-solid-svg-icons';
 /*component button for finally buy*/
 export default function ItemShopButton(props) {
   return (
-    <>
-      <TouchableOpacity style={styles.Button}>
+    <> 
+      <TouchableOpacity style={styles.Button} onPress={props.nav}>
         <View style={styles.statue}></View>
         <View style={styles.iconContainer}>
           <Image
@@ -19,7 +17,6 @@ export default function ItemShopButton(props) {
             source={require('../../assets/images/Other/shoppingBag.png')}
           />
         </View>
-        <Text style={styles.text}>{props.Text}</Text>
       </TouchableOpacity>
     </>
   );
@@ -27,7 +24,7 @@ export default function ItemShopButton(props) {
 
 const styles = StyleSheet.create({
   Button: {
-    width: responsiveWidth(40),
+    width: responsiveWidth(30),
     height: responsiveHeight(10),
     backgroundColor: '#272727',
     borderRadius: 50,
@@ -37,7 +34,7 @@ const styles = StyleSheet.create({
     borderColor: 'white',
     borderWidth: 2,
     marginTop: responsiveHeight(0),
-    marginLeft: responsiveWidth(30),
+    marginLeft: responsiveWidth(35),
     flexDirection: 'row',
     shadowColor: '#000008',
     elevation: 15,
@@ -54,7 +51,7 @@ const styles = StyleSheet.create({
     width: responsiveWidth(4.5),
     height: responsiveHeight(2.3),
     marginTop: responsiveHeight(2),
-    left: responsiveWidth(13),
+    left: responsiveWidth(16),
     backgroundColor: '#272727',
     borderRadius: 50,
     borderWidth: 3,
@@ -64,7 +61,7 @@ const styles = StyleSheet.create({
     width: responsiveWidth(12),
     height: responsiveHeight(6),
     marginTop: responsiveHeight(1.8),
-    marginRight: responsiveWidth(3),
+    marginRight: responsiveWidth(1),
     backgroundColor: '#FFDA80',
     borderRadius: 50,
     borderWidth: 2,

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -17,13 +17,24 @@ import {
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
 import {Shadow} from 'react-native-shadow-2';
+//Redux
+import axios from 'axios';
 
+import getfood from './../../Action/get_food';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+//..
 const Difdish = (props, {navigation}) => {
+  useEffect(() => {
+  
+    props.Getfood();
+  }, []);
   /*for radio button select*/
   const [radioSelected, setRadioSelected] = useState(1);
   /*connect to data*/
   const difDishData = DifDishData;
-    /*for connect to data and save in data */
+  /*for connect to data and save in data */
   const data = difDishData.map(data => (
     /*list of data and check radio button withstyle*/
     <View
@@ -104,10 +115,12 @@ const Difdish = (props, {navigation}) => {
           <ScrollView>
             <View style={{paddingBottom: responsiveHeight(10)}}>{data}</View>
           </ScrollView>
-         {/*button component*/}
+          {/*button component*/}
           <TouchableOpacity
             style={styles.Button}
-            onPress={() => props.navigation.navigate('Login')}>
+            onPress={() => {
+              props.navigation.navigate('Login');
+            }}>
             <View>
               <Text
                 style={{
@@ -125,7 +138,7 @@ const Difdish = (props, {navigation}) => {
     </SafeAreaView>
   );
 };
-export default Difdish;
+
 const styles = StyleSheet.create({
   difDishBg: {
     width: responsiveWidth(100),
@@ -248,3 +261,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      Getfood: getfood,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(Difdish);

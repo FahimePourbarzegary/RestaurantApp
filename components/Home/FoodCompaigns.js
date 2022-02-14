@@ -115,8 +115,7 @@ export default function FoodCompaigns(props, {navigation}) {
         <Text style={styles.TitelPageFood}>Food </Text>
         <Text style={styles.TitelPage}>Campaigns</Text>
       </View>
-      <View
-        style={styles.ScrollStyleContainer}>
+      <View style={styles.ScrollStyleContainer}>
         <ScrollView>
           <View style={{paddingBottom: responsiveHeight(20)}}>
             {renderCompaignItem}
@@ -239,9 +238,9 @@ const styles = StyleSheet.create({
     marginTop: responsiveHeight(1),
     right: responsiveWidth(3),
   },
-  ScrollStyleContainer:{
-  height: responsiveHeight(80),
-  width: responsiveWidth(93),
-  marginLeft: responsiveWidth(5),
- },
-});
+  ScrollStyleContainer: {
+    height: responsiveHeight(80),
+    width: responsiveWidth(93),
+    marginLeft: responsiveWidth(5),
+  },
+}); 

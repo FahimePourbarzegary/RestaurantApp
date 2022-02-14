@@ -15,7 +15,9 @@ import {
 } from 'react-native-responsive-dimensions';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
-export default function FoodFilter() {
+export default function FoodFilter(props, {navigation}) {
+  const [Selection, setSelection] = useState('Food');
+  const {id} = props.route.params;
   const [filterMenue, setfilterMenue] = useState([
     {
       title: 'Food',
@@ -32,6 +34,11 @@ export default function FoodFilter() {
       imageWhite: require('../../assets/images/FoodFilter/PastaWhite.png'),
       imageBlack: require('../../assets/images/FoodFilter/PastaBlack.png'),
     },
+    {
+      title: 'Pizza',
+      imageWhite: require('../../assets/images/FoodFilter/pizzaWhite.png'),
+      imageBlack: require('../../assets/images/FoodFilter/pizzaBlack.png'),
+    },
   ]);
 
   const [SelectMenu, setSelectMenu] = useState(0);
@@ -43,7 +50,11 @@ export default function FoodFilter() {
           ? styles.containerFilterHeadS
           : styles.containerFilterHead
       }
-      onPress={() => setSelectMenu(SelectMenu => index)}>
+      onPress={() => {
+        setSelectMenu(SelectMenu => index);
+        setSelection(item.title);
+        console.log(Selection);
+      }}>
       <Image
         source={index === SelectMenu ? item.imageWhite : item.imageBlack}
       />
@@ -53,7 +64,6 @@ export default function FoodFilter() {
       </Text>
     </TouchableOpacity>
   ));
-
 
   return (
     <SafeAreaView style={styles.filterfood}>
@@ -76,25 +86,18 @@ export default function FoodFilter() {
         <Text style={styles.TitelPage}>Filter </Text>
       </View>
       <View style={styles.containerAllData}>
-        <ScrollView horizontal>{renderFilter}</ScrollView>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {renderFilter}
+        </ScrollView>
       </View>
-      <ScrollView style={{marginBottom: 40}}>
-       
-        <Text style={styles.titleOfFilter}>Price</Text>
-        <View style={styles.containerAllDataLocation}>
-          <View style={{diplay: 'flex', flexWrap: 'wrap'}}>
-            <TouchableOpacity style={styles.minPrice}>
-              <Text style={styles.textMM}>Min</Text>
-              <Text style={styles.textPrice}>$ 7,99</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.maxPrice}>
-              <Text style={styles.textMM}>Man</Text>
-              <Text style={styles.textPrice}>$ 7,99</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-      <TouchableOpacity style={styles.Button}>
+      <TouchableOpacity
+        style={styles.Button}
+        onPress={() => {
+          props.navigation.navigate('CategoriesBottomMenue', {
+            filter: Selection,
+            id: id,
+          });
+        }}>
         <View>
           <Text
             style={{
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
     marginLeft: responsiveWidth(7),
     marginTop: responsiveHeight(4),
   },
-  clearText: {
+  clearText: { 
     color: '#9C9C9C',
     fontFamily: 'Gilroy-Regular',
     fontSize: responsiveFontSize(2),

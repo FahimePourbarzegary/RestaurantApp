@@ -1,24 +1,37 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Image,
   SafeAreaView,
-  ScrollView,
 } from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
-  responsiveFontSize,
 } from 'react-native-responsive-dimensions';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSearch} from '@fortawesome/free-solid-svg-icons';
 import ProductLittelBox from './ProductLittelBox';
 import ButtonShop from '../Button/ItemShopButton.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Search(props, {navigation}) {
+  const [userData, setUserData] = useState('');
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@user_info')
+        .then(data => data)
+        .then(value => {
+          setUserData(JSON.parse(value));
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <SafeAreaView style={styles.search}>
       <TouchableOpacity
@@ -36,13 +49,10 @@ export default function Search(props, {navigation}) {
           style={{alignSelf: 'center'}}
         />
       </TouchableOpacity>
-      <View style={styles.groupTitelPage}>
-        <Text style={styles.TitelPageFood}>Search </Text>
-        <Text style={styles.TitelPage}>Food 40 Resulth </Text>
-      </View>
-    <ProductLittelBox navigation={props.navigation} />
+ 
+      <ProductLittelBox id={userData.id} navigation={props.navigation} />
       <View style={{position: 'absolute', bottom: 30}}>
-        <ButtonShop Text="2 item" />
+        <ButtonShop />
       </View>
     </SafeAreaView>
   );
@@ -72,19 +82,5 @@ const styles = StyleSheet.create({
     borderLeftColor: '#C4C4C4',
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
-  },
-  groupTitelPage: {
-    marginLeft: responsiveWidth(6),
-    marginTop: responsiveHeight(2),
-  },
-  TitelPage: {
-    fontFamily: 'Gilroy-Medium',
-    fontSize: responsiveFontSize(4),
-    color: '#2F2F2F',
-  },
-  TitelPageFood: {
-    fontFamily: 'Gilroy-Light',
-    fontSize: responsiveFontSize(4),
-    color: '#2F2F2F',
   },
 });

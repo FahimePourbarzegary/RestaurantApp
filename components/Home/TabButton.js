@@ -52,9 +52,11 @@ export default function TabButton() {
     <View
       style={{marginLeft: responsiveWidth(5), marginTop: responsiveWidth(2)}}>
       <Text style={styles.title}>Add Extra`as Topping</Text>
-      <ScrollView horizontal={true}>{renderTabButton}</ScrollView>
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+        {renderTabButton}
+      </ScrollView>
     </View>
-  );
+  ); 
 }
 const styles = StyleSheet.create({
   title: {

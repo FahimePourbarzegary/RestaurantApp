@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,10 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
+import {faPlus, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {
   responsiveHeight,
   responsiveWidth,
@@ -17,12 +18,60 @@ import {
 import {Shadow} from 'react-native-shadow-2';
 import Button from '../Button/Button.js';
 import LinearGradient from 'react-native-linear-gradient';
-export default function SignUp(props, {navigation}) {
+//Redux
+import axios from 'axios';
+import putuser from './../../Action/put_user';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+//..
+
+function SignUp(props, {navigation}) {
   const [userName, setUserName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userData, setDataUser] = useState([]);
+  const [ImageUri, setImageUri] = useState(null);
+  //const [Blob, setBlob] = useState(null);
+  const OnSelect = data => {
+    setImageUri(data);
+    // setBlob(btob);
+  };
+  useEffect(() => {}, []);
+  const InsertUser = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/User/insertUser', state)
+        .then(res => res.data)
+        .then(data => {
+          console.log(data);
+          if (data == 1) {
+            Alert.alert('username has already exist');
+          } else if (data == 2) {
+            Alert.alert('phoneNumber has already exist');
+          } else {
+            props.navigation.navigate('Login');
+          }
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const Submit = () => {
+    Clickinsert();
+  };
+  const Clickinsert = () => {
+    const state = {
+      username: userName,
+      email: email,
+      phonenumber: phoneNumber,
+      password: password,
+      image: userData.image,
+      address: 'Edit your Address',
+    };
 
+    InsertUser(state);
+  };
   return (
     <View>
       <View>
@@ -38,8 +87,21 @@ export default function SignUp(props, {navigation}) {
           ' rgba(255, 255, 255, 30) 116.03%',
         ]}
         style={styles.bgWhite}>
-        <View style={styles.inputImage}>
-          <TouchableOpacity style={styles.inputImageIcon}>
+        <TouchableOpacity
+          style={styles.close}
+          onPress={() => props.navigation.goBack()}>
+          <FontAwesomeIcon icon={faTimes} color="#353535" size={22} />
+        </TouchableOpacity>
+        <View style={{flexDirection: 'row'}}>
+          <Image
+            source={{uri: 'data:image/jpeg;base64,' + ImageUri}}
+            style={styles.inputImage}
+          />
+          <TouchableOpacity
+            style={styles.inputImageIcon}
+            onPress={() =>
+              props.navigation.navigate('ImagePicker', {OnSelect: OnSelect})
+            }>
             <FontAwesomeIcon icon={faPlus} color="#6B6B6B" />
           </TouchableOpacity>
         </View>
@@ -64,23 +126,20 @@ export default function SignUp(props, {navigation}) {
             placeholder="Password"
             onChangeText={val => setPassword(val)}></TextInput>
         </View>
-        <Button
-          Text="Login to app"
-          nav={() => props.navigation.navigate('Special')}
-        />
+        <Button Text="Login to app" nav={() => Submit()} />
         <View style={{flexDirection: 'row'}}>
           <Text style={styles.Signup}>I have account.</Text>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.navigate('Login');
+              Submit();
             }}>
             <Text style={styles.Sign}>Login</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
     </View>
-  );
-}
+  ); 
+} 
 const styles = StyleSheet.create({
   Bg: {
     width: responsiveWidth(100),
@@ -104,14 +163,15 @@ const styles = StyleSheet.create({
     marginLeft: responsiveWidth(35),
   },
   inputImageIcon: {
+    position: 'absolute',
     backgroundColor: '#FFFFFF',
     width: responsiveWidth(10),
     height: responsiveWidth(10),
     borderRadius: 100 / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: responsiveHeight(4),
-    marginLeft: responsiveWidth(22),
+    marginLeft: responsiveHeight(32),
+    marginTop: responsiveHeight(-3),
   },
   TextContainer: {
     width: responsiveWidth(25),
@@ -168,4 +228,22 @@ const styles = StyleSheet.create({
     fontFamily: 'Avenir Medium',
     fontSize: responsiveFontSize(2),
   },
+  close: {
+    position: 'absolute',
+    marginLeft: responsiveWidth(90),
+    marginTop: responsiveHeight(4),
+  },
 });
+const mapStateToProps = state => ({
+  user: state.user,
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      Putuser: putuser,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

@@ -1,13 +1,11 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
-  Image,
   SafeAreaView,
-  ScrollView,
+  Alert,
 } from 'react-native';
 import {
   responsiveHeight,
@@ -16,14 +14,99 @@ import {
 } from 'react-native-responsive-dimensions';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
+
 import CardProductBox from './CardProductBox.js';
 import BuyNowButton from '../Button/BuyNowButton.js';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 export default function MyCard(props, {navigation}) {
+  const [userData, setUserData] = useState('');
+  const [FoodData, setFoodData] = useState('');
+  const [Number, setNumber] = useState(false);
+
+  const {id} = props.route.params;
+  useEffect(() => {
+    Show();
+  }, [props.navigation]);
+  const showCardbyid = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/Card/showCardbyid', state)
+        .then(res => res.data)
+        .then(data => {
+          setFoodData(data);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const Show = () => {
+    ClickShow();
+  };
+  const ClickShow = () => {
+    const state = {
+      user_id: id,
+    };
+    showCardbyid(state);
+  };
+  const deleteCard = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/Card/deleteAll', state)
+        .then(res => res.data)
+        .then(data => {
+          setFoodData(null);
+          Alert.alert('Delete All Food From Your Card');
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const DeleteAll = () => {
+    ClickDeleteAll();
+  };
+  const ClickDeleteAll = () => {
+    const state = {
+      user_id: id,
+    };
+    deleteCard(state);
+  };
+  const UpdateCard = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/Card/UpdateCard', state)
+        .then(res => res.data)
+        .then(data => {
+          console.log(data);
+          Alert.alert('Update All Food From Your Card');
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const Update = () => {
+    ClickUpdateCard();
+  };
+  const ClickUpdateCard = () => {
+    const state = {
+      user_id: id,
+    };
+    UpdateCard(state);
+  };
+  const ShowCard = () => {
+    return (
+      <CardProductBox FoodData={FoodData} userid={id} FuncShow={() => Show()} />
+    );
+  };
+
   return (
     <SafeAreaView style={styles.mycard}>
       <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity style={styles.clear}>
+        <TouchableOpacity
+          style={styles.clear}
+          onPress={() => {
+            DeleteAll();
+          }}>
           <Text style={styles.clearText}>Clear All</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -40,13 +123,19 @@ export default function MyCard(props, {navigation}) {
         <Text style={styles.TitelPageFood}>My </Text>
         <Text style={styles.TitelPage}>Card </Text>
       </View>
-      <CardProductBox />
+
+      {ShowCard()}
+
       <View style={{flexDirection: 'row'}}>
-        <BuyNowButton />
-        <View style={styles.priceContainer}>
-          <Text style={styles.tprice}>Total Price</Text>
-          <Text style={styles.price}> $7,90 </Text>
-        </View>
+        <BuyNowButton
+          nav={() => {
+            Update();
+            setTimeout(() => {
+              Show();
+            }, 1000);
+          }}
+        />
+        <View style={styles.priceContainer}></View>
       </View>
     </SafeAreaView>
   );
@@ -102,5 +191,5 @@ const styles = StyleSheet.create({
     color: '#2F2F2F',
     fontFamily: 'Gilroy-Regular',
     fontSize: responsiveFontSize(4),
-  },
+  }, 
 });

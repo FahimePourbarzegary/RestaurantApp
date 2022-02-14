@@ -1,27 +1,25 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
-  responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faShoppingBag} from '@fortawesome/free-solid-svg-icons';
+
 /*button component for add food to list*/
-export default function ShopIconButton() {
+export default function ShopIconButton(props) {
   return (
     <>
-      <TouchableOpacity style={styles.Button}>
+      <TouchableOpacity style={styles.Button} onPress={props.nav}>
         <View style={styles.iconContainer}>
           <Image
             style={styles.shoppingbag}
             source={require('../../assets/images/Other/shoppingBag.png')}
           />
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> 
     </>
   );
-}
+} 
 const styles = StyleSheet.create({
   Button: {
     position: 'absolute',

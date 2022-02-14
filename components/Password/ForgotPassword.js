@@ -6,18 +6,18 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
-import {
+import {faTimes} from '@fortawesome/free-solid-svg-icons';
+import { 
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import {Shadow} from 'react-native-shadow-2';
 import Button from '../Button/Button.js';
 import LinearGradient from 'react-native-linear-gradient';
-export default function ForgotPassword() {
+export default function ForgotPassword(props, {navigation}) {
   const [phoneNumber, setPhoneNumber] = useState('');
   return (
     <View>
@@ -34,6 +34,11 @@ export default function ForgotPassword() {
           ' rgba(255, 255, 255, 30) 116.03%',
         ]}
         style={styles.bgWhite}>
+        <TouchableOpacity
+          style={styles.close}
+          onPress={() => props.navigation.goBack()}>
+          <FontAwesomeIcon icon={faTimes} color="#353535" size={22} />
+        </TouchableOpacity>
         <View style={styles.icon}>
           <Image source={require('../.././assets/images/Other/security.png')} />
         </View>
@@ -41,10 +46,7 @@ export default function ForgotPassword() {
           <Text style={styles.Text}>Forgot Password</Text>
         </View>
         <View style={styles.text}>
-          <Text
-            style={styles.phoneText}>
-            Enter your Phone Number
-          </Text>
+          <Text style={styles.phoneText}>Enter your Phone Number</Text>
         </View>
         <View style={styles.textInputeContainer}>
           <TextInput
@@ -52,7 +54,10 @@ export default function ForgotPassword() {
             placeholder="Phone Number"
             onChangeText={val => setPhoneNumber(val)}></TextInput>
         </View>
-        <Button Text="Next App" />
+        <Button
+          Text="Next App"
+          nav={() => Alert.alert('This option not work now')}
+        />
       </LinearGradient>
     </View>
   );
@@ -120,10 +125,15 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(2.5),
     color: '#B0B0B0',
   },
-  phoneText:{
-  color: '#B0B0B0',
-  fontSize: responsiveFontSize(1.8),
-  fontFamily: 'Avenir_Medium',
+  phoneText: {
+    color: '#B0B0B0',
+    fontSize: responsiveFontSize(1.8),
+    fontFamily: 'Avenir_Medium',
   },
   iconSecurity: {},
+  close: {
+    position: 'absolute',
+    marginLeft: responsiveWidth(90),
+    marginTop: responsiveHeight(4),
+  },
 });

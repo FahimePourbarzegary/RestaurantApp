@@ -1,26 +1,111 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, Image, TextInput, Alert} from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import {Shadow} from 'react-native-shadow-2';
 import LinearGradient from 'react-native-linear-gradient';
 import Button from '../Button/Button.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 export default function ChangePassword(props, {navigation}) {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [reNewPassword, setReNewPassword] = useState('');
+  const [styleAuthP, setStyleAuthP] = useState(true);
+  const [styleAuthOP, setStyleAuthOP] = useState(true);
+  const [userData, setUserData] = useState('');
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@user_info')
+        .then(data => data)
+        .then(value => {
+          setUserData(JSON.parse(value));
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const StoreData = async user => {
+    try {
+      const jsonValue = JSON.stringify(user);
+      await AsyncStorage.removeItem('@user_info');
+      await AsyncStorage.setItem('@user_info', jsonValue);
+      console.log(JSON.stringify(user));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const removeData = async () => {
+    try {
+      await AsyncStorage.removeItem('@user_info');
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+  const changePassword = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/User/ChangePassword', state)
+        .then(res => res.data)
+        .then(data => {
+          console.log(data);
+          removeData();
+          StoreData(userData);
+          getData();
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const Change = () => {
+    ClickChange();
+  };
+  const ClickChange = () => {
+    const state = {
+      id: userData.id,
+      password: newPassword,
+    };
+    changePassword(state);
+  };
+  const tickClick = () => {
+    if (reNewPassword != newPassword) {
+      setStyleAuthP(false);
+    } else {
+      setStyleAuthP(true);
+    }
+  };
+  const tickClickOldPas = () => {
+    if (oldPassword != userData.password) {
+      setStyleAuthOP(false);
+    } else {
+      setStyleAuthOP(true);
+    }
+  };
+  const SaveClick = () => {
+    if (newPassword == '' || reNewPassword == '') {
+      setStyleAuthP(false);
+    } else if (reNewPassword != newPassword) {
+      setStyleAuthP(false);
+    } else if (
+      styleAuthP == false ||
+      styleAuthOP == false ||
+      oldPassword == ''
+    ) {
+      Alert.alert('Check Your input again something Wrong');
+    } else {
+      console.log('ok');
+      userData.password = newPassword;
+      Change();
+      props.navigation.goBack();
+    }
+  };
   return (
     <View>
       <View>
@@ -43,43 +128,50 @@ export default function ChangePassword(props, {navigation}) {
           <Text style={styles.Text}>Change Password</Text>
         </View>
         <View style={styles.text}>
-          <Text
-            style={styles.old}>
-            Enter Old Password
-          </Text>
+          <Text style={styles.old}>Enter Old Password</Text>
         </View>
 
         <View style={styles.textInputeContainer}>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              styleAuthOP ? null : {borderColor: 'red', borderWidth: 2},
+            ]}
             placeholder="Old Password"
-            onChangeText={val => setOldPassword(val)}></TextInput>
+            onChangeText={val => setOldPassword(val)}
+            onEndEditing={() => tickClickOldPas()}></TextInput>
         </View>
         <View style={{marginTop: responsiveHeight(2)}}></View>
         <View style={styles.text}>
-          <Text
-            style={styles.new}>
-            Create New Password
-          </Text>
+          <Text style={styles.new}>Create New Password</Text>
         </View>
         <View style={styles.textInputeContainer}>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              styleAuthP ? null : {borderColor: 'red', borderWidth: 2},
+            ]}
             placeholder="Enter New Password"
+            secureTextEntry={true}
             onChangeText={val => setNewPassword(val)}></TextInput>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              styleAuthP ? null : {borderColor: 'red', borderWidth: 2},
+            ]}
             placeholder="Re Enter New Password"
-            onChangeText={val => setReNewPassword(val)}></TextInput>
+            onChangeText={val => setReNewPassword(val)}
+            secureTextEntry={true}
+            onEndEditing={() => tickClick()}></TextInput>
         </View>
 
-        <Button Text="Save" nav={() => props.navigation.goBack()} />
+        <Button Text="Save" nav={() => SaveClick()} />
       </LinearGradient>
     </View>
   );
 }
 const styles = StyleSheet.create({
-  Bg: {
+  Bg: { 
     width: responsiveWidth(100),
     height: responsiveWidth(60),
   },
@@ -144,16 +236,16 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
     paddingHorizontal: 20,
   },
-  old:{
-     color: '#B0B0B0',
-     fontSize: responsiveFontSize(1.8),
-     fontFamily: 'Avenir_Medium',
+  old: {
+    color: '#B0B0B0',
+    fontSize: responsiveFontSize(1.8),
+    fontFamily: 'Avenir_Medium',
   },
-    new:{
+  new: {
     marginTop: responsiveHeight(2),
     color: '#B0B0B0',
     fontSize: responsiveFontSize(1.8),
     fontFamily: 'Avenir_Medium',
-    },
+  },
   iconSecurity: {},
 });

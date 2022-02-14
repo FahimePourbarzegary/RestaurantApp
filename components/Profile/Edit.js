@@ -8,18 +8,21 @@ import {
   TextInput,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faPlus,faTimes} from '@fortawesome/free-solid-svg-icons';
+import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import {Shadow} from 'react-native-shadow-2';
 import Button from '../Button/Button.js';
 import LinearGradient from 'react-native-linear-gradient';
-export default function Edit(props,navigation,route) {
-  const {title,text} = props.route.params;
-  const [phoneNumber, setPhoneNumber] = useState('');
+export default function Edit(props, navigation, route) {
+  const {title, text, type} = props.route.params;
+  const [TextEdit, setTextEdit] = useState('');
+  const submit = () => {
+    props.route.params.EditText(TextEdit, type);
+    props.navigation.goBack();
+  };
   return (
     <View>
       <View>
@@ -38,29 +41,31 @@ export default function Edit(props,navigation,route) {
         <View style={styles.icon}>
           <Image source={require('../.././assets/images/Other/security.png')} />
         </View>
-           <TouchableOpacity
+        <TouchableOpacity
           style={styles.close}
           onPress={() => props.navigation.goBack()}>
           <FontAwesomeIcon icon={faTimes} color="#353535" size={22} />
         </TouchableOpacity>
         <View style={styles.TextContainer}>
-     
           <Text style={styles.Text}>{title}</Text>
         </View>
         <View style={styles.text}>
-          <Text
-            style={styles.phoneText}>
-            Enter Edit
-          </Text>
+          <Text style={styles.phoneText}>Enter Edit</Text>
         </View>
         <View style={styles.textInputeContainer}>
           <TextInput
             style={styles.input}
             placeholder="Edit"
-            onChangeText={val => setPhoneNumber(val)}>{text}
-            </TextInput>
+            onChangeText={val => setTextEdit(val)}>
+            {text}
+          </TextInput>
         </View>
-        <Button Text="Edit" />
+        <Button
+          Text="Edit"
+          nav={() => {
+            submit();
+          }}
+        />
       </LinearGradient>
     </View>
   );
@@ -128,15 +133,15 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(2.5),
     color: '#B0B0B0',
   },
-  phoneText:{
-  color: '#B0B0B0',
-  fontSize: responsiveFontSize(1.8),
-  fontFamily: 'Avenir_Medium',
+  phoneText: {
+    color: '#B0B0B0',
+    fontSize: responsiveFontSize(1.8),
+    fontFamily: 'Avenir_Medium',
   },
   iconSecurity: {},
-    close: {
+  close: {
     position: 'absolute',
     marginLeft: responsiveWidth(90),
     marginTop: responsiveHeight(4),
-  },
+  }, 
 });

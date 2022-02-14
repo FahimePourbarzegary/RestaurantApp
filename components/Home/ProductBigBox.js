@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -13,14 +13,77 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import categoryFoodList from '../../assets/data/Specialdata/categoryFoodList.js';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart, faAngleRight} from '@fortawesome/free-solid-svg-icons';
-export default function ProductBigBox(props, {navigation}) {
-  nv = props.navigation;
-  const [like, setLike] = useState(0);
-  const [color, setColor] = useState('#AAAAAA');
+import {CommonActions} from '@react-navigation/native';
+//Redux
+import axios from 'axios';
+import getfood from './../../Action/get_food';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+
+//..
+function ProductBigBox(props, {navigation}) {
+  const [foods, setfoods] = useState('');
+  useEffect(() => {
+    props.Getfood();
+    setfoods(props.food.data);
+  }, []);
+
   const renderCategoryFoodList = ({item}) => {
+    const checkLike = async state => {
+      try {
+        const res = await axios
+          .post('http://192.168.43.121/api/Like/checkLike', state)
+          .then(res => res.data)
+          .then(data => {
+            item.favorite = data;
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    const Check = () => {
+      ClickCheck();
+    };
+    const ClickCheck = () => {
+      const state = {
+        name: item.name,
+        id_user: props.id,
+      };
+      checkLike(state);
+    };
+    Check();
+    const insertLike = async state => {
+      try {
+        const res = await axios
+          .post('http://192.168.43.121/api/Like/insertLike', state)
+          .then(res => res.data)
+          .then(data => {
+            console.log(data);
+            item.favorite = data;
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    const SubmitLike = () => {
+      ClickinsertLike();
+    };
+    const ClickinsertLike = () => {
+      const state = {
+        name: item.name,
+        filter: item.filter,
+        image: item.image,
+        calories: item.calories,
+        composition: item.composition,
+        Description: item.Description,
+        price: item.price,
+        favorite: 1,
+        id_user: props.id,
+      };
+      insertLike(state);
+    };
     return (
       <View style={styles.containerFoodList}>
         <View style={styles.caloriesLike}>
@@ -33,11 +96,11 @@ export default function ProductBigBox(props, {navigation}) {
           </View>
           <TouchableOpacity
             onPress={() => {
-              setLike(like => item.id);
+              SubmitLike();
             }}>
             <Text>
-              {like == item.id && color == '#AAAAAA' ? (
-                <FontAwesomeIcon icon={faHeart} color="white" />
+              {item.favorite == 1 ? (
+                <FontAwesomeIcon icon={faHeart} color="#FFA500" />
               ) : (
                 <FontAwesomeIcon icon={faHeart} color="#AAAAAA" />
               )}
@@ -46,26 +109,35 @@ export default function ProductBigBox(props, {navigation}) {
         </View>
         <View>
           <Image
-            source={require('../../assets/images/Other/food.jpg')}
+            source={{uri: 'data:image/jpeg;base64,' + item.image}}
             style={styles.imageContainer}
           />
         </View>
         <View style={styles.foodDetail}>
           <Text style={styles.nameStyle}>{item.name}</Text>
-          <Text style={styles.compositionsStyle}>{item.compositions}</Text>
+          <Text style={styles.compositionsStyle}>{item.composition}</Text>
           <Text style={styles.priceStyle}>${item.price}</Text>
         </View>
         <TouchableOpacity
           style={styles.buttonnext}
           onPress={() =>
-            nv.navigate(item.nav, {
-              id: item.id,
-              calories: item.calories,
-              name: item.name,
-              Description: item.Description,
-              price: item.price,
-              route: props.route,
-            })
+            props.navigation.dispatch(
+              CommonActions.navigate({
+                name: 'FoodDetail',
+                params: {
+                  id: item.id,
+                  calories: item.calories,
+                  filter: item.filter,
+                  name: item.name,
+                  image: item.image,
+                  Description: item.description,
+                  price: item.price,
+                  favorite: item.favorite,
+                  composition: item.composition,
+                  route: props.route,
+                },
+              }),
+            )
           }>
           <FontAwesomeIcon
             icon={faAngleRight}
@@ -80,10 +152,11 @@ export default function ProductBigBox(props, {navigation}) {
     <ScrollView>
       <View style={styles.categoryFoodlist}>
         <FlatList
-          data={categoryFoodList}
+          data={foods}
           renderItem={renderCategoryFoodList}
           keyExtractor={item => item.id}
           horizontal={true}
+          showsHorizontalScrollIndicator={false}
         />
       </View>
     </ScrollView>
@@ -95,13 +168,15 @@ const styles = StyleSheet.create({
     marginLeft: responsiveWidth(6),
     marginTop: responsiveHeight(4),
     height: responsiveHeight(48),
-  },
+  }, 
   containerFoodList: {
     width: responsiveWidth(55),
     height: responsiveHeight(42),
     marginRight: responsiveWidth(5),
     backgroundColor: '#FAFBFD',
     borderRadius: 15,
+    shadowColor: '#0009',
+    elevation: 10,
   },
   caloriesLike: {
     width: responsiveWidth(45),
@@ -160,4 +235,17 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(2.5),
     marginTop: responsiveHeight(2),
   },
-}); 
+});
+const mapStateToProps = state => ({
+  food: state.food,
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      Getfood: getfood,
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(ProductBigBox);

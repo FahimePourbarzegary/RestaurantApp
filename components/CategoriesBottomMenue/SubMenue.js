@@ -5,7 +5,7 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-export default function SubMenue() {
+export default function SubMenue(props) {
   return (
     <View style={styles.submenue}>
       <TouchableOpacity
@@ -13,44 +13,43 @@ export default function SubMenue() {
           flexDirection: 'row',
           marginLeft: responsiveWidth(6),
           marginRight: responsiveWidth(5),
-        }}>
+        }}
+        onPress={props.home}>
         <Image
           style={styles.imageStyleall}
           source={require('../../assets/images/Other/home.png')}
         />
-        <Text
-          style={styles.textHome}>
-          Home
-        </Text>
+        <Text style={styles.textHome}>Home</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={props.search}>
         <Image
           style={styles.imageStyleSp}
           source={require('../../assets/images/Other/search.png')}
         />
       </TouchableOpacity>
       <TouchableOpacity>
-        <Image
+        <Image 
           style={styles.imageStyleSp}
           source={require('../../assets/images/Other/notification.png')}
         />
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={props.Favorites}>
         <Image
           style={styles.imageStyleSp}
           source={require('../../assets/images/Other/star.png')}
         />
       </TouchableOpacity>
-      <View style={styles.imageContainer}></View>
     </View>
   );
 }
 const styles = StyleSheet.create({
   submenue: {
+    position: 'absolute',
     width: responsiveWidth(85),
     height: responsiveHeight(10),
     marginLeft: responsiveWidth(8),
-    marginTop: responsiveHeight(2),
+    marginTop: responsiveHeight(85),
+    marginBottom: 0,
     backgroundColor: '#FAFBFD',
     borderRadius: 50,
     borderColor: 'white',
@@ -78,10 +77,10 @@ const styles = StyleSheet.create({
     shadowColor: '#000009',
     elevation: 5,
   },
-  textHome:{
-  marginLeft: responsiveWidth(2),
-  fontFamily: 'Avenir_Medium',
-  color: '#AFAEBF',
-  fontSize: responsiveFontSize(2),
+  textHome: {
+    marginLeft: responsiveWidth(2),
+    fontFamily: 'Avenir_Medium',
+    color: '#AFAEBF',
+    fontSize: responsiveFontSize(2),
   },
 });

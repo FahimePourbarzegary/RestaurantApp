@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {
   responsiveHeight,
@@ -18,11 +20,69 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSearch} from '@fortawesome/free-solid-svg-icons';
 import ButtonShop from '../Button/ItemShopButton.js';
 import categoriesNavData from '../../assets/data/Specialdata/categoriesNavData.js';
-import categoryFoodList from '../../assets/data/Specialdata/categoryFoodList.js';
 import CoInfoAddress from './CoInfoAddress.js';
 import ProductBigBox from './ProductBigBox.js';
-export default function Special(props, {navigation}) {
+//Redux
+import axios from 'axios';
+import getfood from './../../Action/get_food';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+//..
+function Special(props, {navigation}) {
+  const [userData, setUserData] = useState();
   const [selection, setselection] = useState(1);
+  const [Token, setToken] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@user_info')
+        .then(data => data)
+        .then(value => {
+          setUserData(JSON.parse(value));
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const getToken = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('token')
+        .then(data => data)
+        .then(value => {
+          setToken(JSON.stringify(value));
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  useEffect(() => {
+    getData();
+    props.Getfood();
+    getToken();
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
+  const EditText = (data, title) => {
+    if (title === 'address') {
+      setUserData(Data => ({...Data, address: data}));
+      Alert.alert('please change your address in Profile');
+    } else {
+      console.log('error');
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size="large" color="#EFC151" />
+      </View>
+    );
+  }
+  console.log('Token' + Token);
   const renderCategoryItem = categoriesNavData.map(item => (
     <View>
       <TouchableOpacity
@@ -63,7 +123,11 @@ export default function Special(props, {navigation}) {
         <View style={styles.yellow}></View>
         <View style={styles.black}></View>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.searchbox}>
+      <TouchableOpacity
+        style={styles.searchbox}
+        onPress={() => {
+          props.navigation.navigate('Search');
+        }}>
         <FontAwesomeIcon
           icon={faSearch}
           size={22}
@@ -75,15 +139,31 @@ export default function Special(props, {navigation}) {
         <Text style={styles.TitelPageFood}>Food </Text>
         <Text style={styles.TitelPage}>Special For You</Text>
       </View>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.categorycontainer}>
-          <ScrollView horizontal={true}>{renderCategoryItem}</ScrollView>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+            {renderCategoryItem}
+          </ScrollView>
         </View>
-        <ProductBigBox navigation={props.navigation} />
-        <CoInfoAddress />
+        <ProductBigBox navigation={props.navigation} id={userData.id} />
+        <CoInfoAddress
+          text={userData.address}
+          navigation={() =>
+            props.navigation.navigate('Edit', {
+              text: userData.address,
+              title: 'Address',
+              type: 'address',
+              EditText: EditText,
+            })
+          }
+        />
       </ScrollView>
       <View style={{position: 'absolute', bottom: 30}}>
-        <ButtonShop Text="2 item" />
+        <ButtonShop
+          nav={() => {
+            props.navigation.navigate('MyCard', {id: userData.id});
+          }}
+        />
       </View>
     </SafeAreaView>
   );
@@ -101,7 +181,7 @@ const styles = StyleSheet.create({
     marginTop: responsiveHeight(4),
     height: responsiveHeight(6),
     width: responsiveWidth(7),
-  },
+  }, 
   black: {
     backgroundColor: '#272727',
     borderRadius: 20,
@@ -187,3 +267,17 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
+const mapStateToProps = state => ({
+ 
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators(
+    {
+      Getfood: getfood,
+    
+    },
+    dispatch,
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(Special);

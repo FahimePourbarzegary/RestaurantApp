@@ -1,0 +1,13 @@
+export const GET_USER = 'get_user';
+export const PUT_USER = 'put_user';
+export const GET_FOOD = 'get_food';
+export const SET_USER = 'set_user';
+export const LOG_OUT = 'log_out';
+export const LOG_IN = 'log_in';
+export const UPDATE_USER = 'update_user';
+export const SIGNUP_USER = 'signup_user';
+export const UPPDATE_FOOD = 'update_food';
+export const INSERT_CARD = 'insert_card';
+export const DELETE_CARD = 'delete_card';
+export const INSERT_LIKE = 'insert_like';
+export const DELETE_LIKE = 'delete_like';

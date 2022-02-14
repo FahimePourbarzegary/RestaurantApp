@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,70 +10,133 @@ import {
 import {
   responsiveHeight,
   responsiveWidth,
-  responsiveFontSize,
+  responsiveFontSize, 
 } from 'react-native-responsive-dimensions';
-import categoryFoodList from '../../assets/data/Specialdata/categoryFoodList.js';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faAngleRight} from '@fortawesome/free-solid-svg-icons';
-
-export default function CategoryProductBox() {
+import axios from 'axios';
+export default function CategoryProductBox(props) {
+  useEffect(() => {
+    props.Func();
+  }, []);
+  console.log(props.FoodList);
+  const Gonext = (
+    id,
+    calories,
+    filter,
+    name,
+    image,
+    description,
+    price,
+    favorite,
+    composition,
+  ) => {
+    props.nv.navigate('FoodDetail', {
+      id: id,
+      calories: calories,
+      filter: filter,
+      name: name,
+      image: image,
+      Description: description,
+      price: price,
+      favorite: favorite,
+      composition: composition,
+      route: props.route,
+    });
+  };
+  const renderCategoryProducts = ({item}) => {
+    const checkLike = async state => {
+      try {
+        const res = await axios
+          .post('http://192.168.43.121/api/Like/checkLike', state)
+          .then(res => res.data)
+          .then(data => {
+            item.favorite = data;
+            console.log(data);
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    const Check = () => {
+      ClickCheck();
+    };
+    const ClickCheck = () => {
+      const state = {
+        name: item.name,
+        id_user: props.id,
+      };
+      console.log(JSON.stringify(state));
+      checkLike(state);
+    };
+    Check();
+    return (
+      <View style={styles.ContainerCategoryBox}>
+        <View style={styles.containerImageCalories}>
+          <Image
+            source={require('../../assets/images/Other/calories.png')}
+            style={styles.ImageCalories}
+          />
+          <Text style={styles.calories}> {item.calories} Calories</Text>
+        </View>
+        <View style={{flexDirection: 'row'}}>
+          <View>
+            <Image
+              source={{uri: 'data:image/jpeg;base64,' + item.image}}
+              style={styles.imageContainer}
+            />
+          </View>
+          <View style={styles.foodDetail}>
+            <Text style={styles.nameStyleText}>{item.name}</Text>
+            <Text style={styles.compositionsText}>{item.compositions}</Text>
+            <Text style={styles.priceText}>${item.price}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.buttonnext}
+            onPress={() => {
+              Gonext(
+                item.id,
+                item.calories,
+                item.filter,
+                item.name,
+                item.image,
+                item.description,
+                item.price,
+                item.favorite,
+                item.composition,
+              );
+            }}>
+            <FontAwesomeIcon
+              icon={faAngleRight}
+              size={25}
+              style={{alignSelf: 'center'}}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
   return (
-    <View
-      style={styles.ContainerAllData}>
+    <View style={{height: responsiveHeight(57)}}>
       <FlatList
-        data={categoryFoodList}
+        data={props.FoodList}
         renderItem={renderCategoryProducts}
         keyExtractor={item => item.id}
       />
     </View>
   );
 }
-const renderCategoryProducts = ({item}) => {
-  return (
-    <View style={styles.ContainerCategoryBox}>
-      <View
-        style={styles.containerImageCalories}>
-        <Image
-          source={require('../../assets/images/Other/calories.png')}
-          style={styles.ImageCalories}
-        />
-        <Text style={styles.calories}> {item.calories} Calories</Text>
-      </View>
-      <View style={{flexDirection: 'row'}}>
-        <View style={styles.imageContainer}></View>
-        <View style={styles.foodDetail}>
-          <Text
-            style={styles.nameStyleText}>
-            {item.name}
-          </Text>
-          <Text
-            style={styles.compositionsText}>
-            {item.compositions}
-          </Text>
-          <Text
-            style={styles.priceText}>
-            ${item.price}
-          </Text>
-        </View>
-        <View style={styles.buttonnext}>
-          <FontAwesomeIcon
-            icon={faAngleRight}
-            size={25}
-            style={{alignSelf: 'center'}}
-          />
-        </View>
-      </View>
-    </View>
-  );
-};
+
 const styles = StyleSheet.create({
   ContainerCategoryBox: {
     width: responsiveWidth(85),
     height: responsiveHeight(18),
-
+    marginLeft: responsiveWidth(5),
     marginBottom: responsiveHeight(4),
     backgroundColor: '#FAFBFD',
     borderRadius: 10,
+    shadowColor: '#0009',
+    elevation: 10,
   },
   calories: {
     fontFamily: 'Gilroy-Medium',
@@ -81,20 +144,25 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     marginLeft: responsiveWidth(3),
-    marginTop: responsiveHeight(1.5),
-    width: responsiveWidth(28),
-    height: responsiveWidth(28),
+    width: responsiveWidth(25),
+    height: responsiveWidth(25),
     borderRadius: 200 / 2,
-    backgroundColor: 'red',
+    backgroundColor: 'yellow',
+  },
+  containerImageCalories: {
+    flexDirection: 'row',
+
+    width: responsiveWidth(30),
+    padding: 5,
   },
   foodDetail: {
     marginLeft: responsiveWidth(3),
-    marginTop: responsiveHeight(4),
+    marginTop: responsiveHeight(2),
   },
   buttonnext: {
     position: 'absolute',
     marginLeft: responsiveWidth(65),
-    marginTop: responsiveHeight(12),
+    marginTop: responsiveHeight(10),
     width: responsiveWidth(13),
     height: responsiveWidth(13),
     borderRadius: 100 / 2,
@@ -104,37 +172,37 @@ const styles = StyleSheet.create({
     shadowColor: 'gray',
     elevation: 15,
   },
-  ContainerAllData:{
-  width: responsiveWidth(85),
-  height: responsiveHeight(55),
-  marginLeft: responsiveWidth(8),
- },
- ContainerAllData:{
-  position: 'absolute',
-  flexDirection: 'row',
-  right: 0,
-  marginTop: responsiveHeight(2),
-  marginRight: responsiveWidth(4),
- },
- ImageCalories:{
-  width: responsiveWidth(3),
-  height: responsiveHeight(2.1),
-  marginRight: responsiveWidth(0.5),
+  ContainerAllData: {
+    width: responsiveWidth(85),
+    height: responsiveHeight(55),
+    marginLeft: responsiveWidth(8),
   },
-  nameStyleText:{
-  fontFamily: 'Gilroy-Regular',
-  color: '#272727',
-  fontSize: responsiveFontSize(2.2),
+  ContainerAllData: {
+    position: 'absolute',
+    flexDirection: 'row',
+    right: 0,
+    marginTop: responsiveHeight(2),
+    marginRight: responsiveWidth(4),
   },
-  compositionsText:{
-  fontFamily: 'Gilroy-Medium',
-  color: '#9C9C9C',
-  fontSize: responsiveFontSize(1.5),
+  ImageCalories: {
+    width: responsiveWidth(3),
+    height: responsiveHeight(2.1),
+    marginRight: responsiveWidth(0.5),
   },
-  priceText:{
-  fontFamily: 'Gilroy-Medium',
-  color: '#313131',
-  fontSize: responsiveFontSize(2.5),
-  marginTop: responsiveHeight(2),
+  nameStyleText: {
+    fontFamily: 'Gilroy-Regular',
+    color: '#272727',
+    fontSize: responsiveFontSize(2.2),
+  },
+  compositionsText: {
+    fontFamily: 'Gilroy-Medium',
+    color: '#9C9C9C',
+    fontSize: responsiveFontSize(1.5),
+  },
+  priceText: {
+    fontFamily: 'Gilroy-Medium',
+    color: '#313131',
+    fontSize: responsiveFontSize(2.5),
+    marginTop: responsiveHeight(2),
   },
 });

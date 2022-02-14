@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Text,
-  ScrollView,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faAngleRight} from '@fortawesome/free-solid-svg-icons';
@@ -17,8 +16,9 @@ import {
 } from 'react-native-responsive-dimensions';
 import {OnboardingData} from '../.././assets/data/Onboarding/OnboardingData';
 import {DifDishData} from '../.././assets/data/Onboarding/DifDishData';
+ 
 /*firstPage if user is not login*/
-export default function Onboarding(props, {navigation}) {
+function Onboarding(props, {navigation}) {
   /*for 3 change*/
   const [index, setIndex] = useState(0);
   /*for connect to data and save in data */
@@ -34,7 +34,7 @@ export default function Onboarding(props, {navigation}) {
       </View>
     </View>
   ));
-
+ 
   return (
     <SafeAreaView style={styles.screen}>
       <BackG OnboardingDatas={OnboardingData[index]} />
@@ -282,3 +282,5 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
 });
+
+export default Onboarding;

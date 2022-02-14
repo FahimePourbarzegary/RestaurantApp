@@ -1,33 +1,23 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Image,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
 
-export default function CoInfoAddress() {
+function CoInfoAddress(props, {navigation}) {
   /*componentInfoBox*/
   return (
     <View style={styles.boxinformation}>
-      <TouchableOpacity style={styles.edit}>
+      <TouchableOpacity style={styles.edit} onPress={props.navigation}>
         <Image
           source={require('../../assets/images/Other/pencil.png')}
           style={{alignSelf: 'center'}}
-        />
+        /> 
       </TouchableOpacity>
       <Text style={styles.infotitle}>Your informations</Text>
-      <View
-        style={styles.containerImageLocation}>
+      <View style={styles.containerImageLocation}>
         <View style={styles.locationContainer}>
           <Image
             source={require('../../assets/images/Other/location.png')}
@@ -35,14 +25,8 @@ export default function CoInfoAddress() {
           />
         </View>
         <View>
-          <Text
-            style={styles.boxAddress}>
-            Your Delivery Address
-          </Text>
-          <Text
-            style={styles.boxAddressText}>
-            241 Hillside Road, HASTINGS
-          </Text>
+          <Text style={styles.boxAddress}>Your Delivery Address</Text>
+          <Text style={styles.boxAddressText}>{props.text}</Text>
         </View>
       </View>
     </View>
@@ -57,6 +41,8 @@ const styles = StyleSheet.create({
     marginLeft: responsiveWidth(6),
     borderRadius: 10,
     backgroundColor: '#FAFBFD',
+    shadowColor: '#0009',
+    elevation: 10,
   },
   edit: {
     position: 'absolute',
@@ -86,20 +72,22 @@ const styles = StyleSheet.create({
     marginLeft: responsiveWidth(4),
     marginTop: responsiveHeight(3),
   },
-  containerImageLocation:{
-  flexDirection: 'row',
-  marginTop: responsiveHeight(2),
-  marginLeft: responsiveWidth(3),
+  containerImageLocation: {
+    flexDirection: 'row',
+    marginTop: responsiveHeight(2),
+    marginLeft: responsiveWidth(3),
   },
-  boxAddress:{
-  color: '#9C9C9C',
-  fontFamily: 'Gilroy-Medium',
-  fontSize: responsiveFontSize(1.5),
+  boxAddress: {
+    color: '#9C9C9C',
+    fontFamily: 'Gilroy-Medium',
+    fontSize: responsiveFontSize(1.5),
   },
-  boxAddressText:{
-  color: '#272727',
-  fontFamily: 'Gilroy-Medium',
-  fontSize: responsiveFontSize(2),
-  marginTop: responsiveHeight(1),
- },
+  boxAddressText: {
+    color: '#272727',
+    fontFamily: 'Gilroy-Medium',
+    fontSize: responsiveFontSize(2),
+    marginTop: responsiveHeight(1),
+  },
 });
+
+export default CoInfoAddress;

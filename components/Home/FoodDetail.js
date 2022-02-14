@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {
   responsiveHeight,
@@ -18,17 +19,107 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faHeart, faPlus, faMinus} from '@fortawesome/free-solid-svg-icons';
 import ShopIconButton from '../Button/ShopIconButton.js';
 import TabButton from './TabButton.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 export default function FoodDetail(props, navigation, route) {
-  const {id, name, calories, Description, price} = props.route.params;
-  const [number, setNumber] = useState(2);
-  const [like, setLike] = useState(false);
+  const {
+    id,
+    name,
+    calories,
+    Description,
+    price, 
+    composition,
+    image,
+    filter,
+    favorite,
+  } = props.route.params;
+  const [number, setNumber] = useState(1);
+  const [like, setLike] = useState(favorite);
+
+  const [userData, setUserData] = useState('');
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@user_info')
+        .then(data => data)
+        .then(value => {
+          setUserData(JSON.parse(value));
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const insertCard = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/Card/insertCard', state)
+        .then(res => res.data)
+        .then(data => {
+          console.log(data);
+          Alert.alert('Add in YourCard');
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const Submit = () => {
+    Clickinsert();
+  };
+  const Clickinsert = () => {
+    const state = {
+      id: id,
+      name: name,
+      image: image,
+      filter: filter,
+      composition: composition,
+      calories: calories,
+      Description: Description,
+      user_id: userData.id,
+      price: price,
+      number: number,
+      condition: 'card',
+    };
+    insertCard(state);
+  };
+
+  const insertLike = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/Like/insertLike', state)
+        .then(res => res.data)
+        .then(data => {
+          console.log(data);
+          setLike(data);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const SubmitLike = () => {
+    ClickinsertLike();
+  };
+  const ClickinsertLike = () => {
+    const state = {
+      name: name,
+      filter: filter,
+      image: image,
+      calories: calories,
+      composition: composition,
+      Description: Description,
+      price: price,
+      favorite: 1,
+      id_user: userData.id,
+    };
+    insertLike(state);
+  };
   return (
     <SafeAreaView style={styles.foodDetail}>
       <View style={styles.backDetail}>
-        <Text
-          style={styles.stylenameFood}>
-          {name}
-        </Text>
+        <Text style={styles.stylenameFood}>{name}</Text>
         <Image
           source={require('../../assets/images/Other/foodbgblack.png')}
           style={styles.ImageStyle}
@@ -45,13 +136,13 @@ export default function FoodDetail(props, navigation, route) {
 
           <TouchableOpacity
             style={styles.likeContainer}
-            onPress={() =>
-              like ? setLike(like => false) : setLike(like => true)
-            }>
+            onPress={() => {
+              SubmitLike();
+            }}>
             <FontAwesomeIcon
               icon={faHeart}
               style={{alignSelf: 'center'}}
-              color={like ? 'white' : '#AAAAAA'}
+              color={like == 1 ? 'orange' : '#AAAAAA'}
             />
           </TouchableOpacity>
         </View>
@@ -79,8 +170,7 @@ export default function FoodDetail(props, navigation, route) {
             <Text style={styles.minus}>-</Text>
           </TouchableOpacity>
         </View>
-        <View
-          style={styles.ImageContainerCalories}>
+        <View style={styles.ImageContainerCalories}>
           <Image
             source={require('../../assets/images/Other/calories.png')}
             style={styles.imageCalories}
@@ -92,21 +182,14 @@ export default function FoodDetail(props, navigation, route) {
         </View>
       </View>
       <ScrollView>
-        <View
-          style={styles.DescriptionContainer}>
-          <Text
-            style={styles.DescriptionText}>
-            Description
-          </Text>
-          <Text
-            style={styles.DescriptionFood}>
-            {Description}
-          </Text>
+        <View style={styles.DescriptionContainer}>
+          <Text style={styles.DescriptionText}>Description</Text>
+          <Text style={styles.DescriptionFood}>{Description}</Text>
         </View>
         <TabButton />
       </ScrollView>
 
-      <ShopIconButton />
+      <ShopIconButton nav={() => Submit()} />
     </SafeAreaView>
   );
 }
@@ -211,46 +294,46 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: responsiveFontSize(4),
   },
-  stylenameFood:{
-  position: 'absolute',
-  fontFamily: 'Gilroy-Medium',
-  fontSize: responsiveFontSize(5),
-  color: 'white',
-  top: responsiveHeight(10),
-  alignSelf: 'center',
+  stylenameFood: {
+    position: 'absolute',
+    fontFamily: 'Gilroy-Medium',
+    fontSize: responsiveFontSize(5),
+    color: 'white',
+    top: responsiveHeight(10),
+    alignSelf: 'center',
   },
-  ImageStyle:{
-  width: responsiveHeight(52),
-  height: responsiveHeight(59),
-  marginLeft: responsiveWidth(11),
-  marginTop: responsiveHeight(1),
-  zIndex: -1,
+  ImageStyle: {
+    width: responsiveHeight(52),
+    height: responsiveHeight(59),
+    marginLeft: responsiveWidth(11),
+    marginTop: responsiveHeight(1),
+    zIndex: -1,
   },
-  ImageContainerCalories:{
-  flexDirection: 'row',
-  marginLeft: responsiveWidth(45),
-  marginTop: responsiveHeight(-2),
+  ImageContainerCalories: {
+    flexDirection: 'row',
+    marginLeft: responsiveWidth(45),
+    marginTop: responsiveHeight(-2),
   },
-  imageCalories:{
-  width: responsiveWidth(3),
-  height: responsiveHeight(2),
-  marginRight: responsiveWidth(1.5),
+  imageCalories: {
+    width: responsiveWidth(3),
+    height: responsiveHeight(2),
+    marginRight: responsiveWidth(1.5),
   },
-  DescriptionContainer:{
-  width: responsiveWidth(90),
-  height: responsiveWidth(20),
-  marginTop: responsiveHeight(2),
-  marginLeft: responsiveWidth(5),
+  DescriptionContainer: {
+    width: responsiveWidth(90),
+    height: responsiveWidth(20),
+    marginTop: responsiveHeight(2),
+    marginLeft: responsiveWidth(5),
   },
-  DescriptionText:{
-  fontFamily: 'Gilroy-Medium',
-  fontSize: responsiveFontSize(2.5),
-  color: '#343333',
+  DescriptionText: {
+    fontFamily: 'Gilroy-Medium',
+    fontSize: responsiveFontSize(2.5),
+    color: '#343333',
   },
-  DescriptionFood:{
-  fontFamily: 'Gilroy-Medium',
-  fontSize: responsiveFontSize(1.8),
-  color: '#BFBBBB',
-  marginTop: responsiveHeight(1),
+  DescriptionFood: {
+    fontFamily: 'Gilroy-Medium',
+    fontSize: responsiveFontSize(1.8),
+    color: '#BFBBBB',
+    marginTop: responsiveHeight(1),
   },
 });

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,92 @@ import {
   FlatList,
   Image,
   TextInput,
-  SafeAreaView,
 } from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import categoryFoodList from '../../assets/data/Specialdata/categoryFoodList.js';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faHeart, faAngleRight} from '@fortawesome/free-solid-svg-icons';
+import {faAngleRight} from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 export default function ProductLittelBox(props, navigation) {
+  const [SearchFood, setSearchFood] = useState(null);
+  const [listFood, setlistFood] = useState(0);
+ 
+  const Gonext = (
+    id,
+    calories,
+    filter,
+    name,
+    image,
+    description,
+    price,
+    favorite,
+    composition,
+  ) => {
+    props.navigation.navigate('FoodDetail', {
+      id: id,
+      calories: calories,
+      filter: filter,
+      name: name,
+      image: image,
+      Description: description,
+      price: price,
+      favorite: favorite,
+      composition: composition,
+      route: props.route,
+    });
+  };
+  const searchFood = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/Food/SearchFood', state)
+        .then(res => res.data)
+        .then(data => {
+          console.log(data);
+          setlistFood(data);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const Search = () => {
+    ClickSearch();
+  };
+  const ClickSearch = () => {
+    const state = {
+      name: SearchFood,
+      filter: SearchFood,
+    };
+    searchFood(state);
+  };
   const renderCategoryFoodList = ({item}) => {
+    const checkLike = async state => {
+      try {
+        const res = await axios
+          .post('http://192.168.43.121/api/Like/checkLike', state)
+          .then(res => res.data)
+          .then(data => {
+            item.favorite = data;
+            console.log(data);
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    const Check = () => {
+      ClickCheck();
+    };
+    const ClickCheck = () => {
+      const state = {
+        name: item.name,
+        id_user: props.id,
+      };
+      console.log(JSON.stringify(state));
+      checkLike(state);
+    };
+    Check();
     return (
       <View style={styles.containerFoodList}>
         <View style={styles.caloriesLike}>
@@ -32,7 +106,7 @@ export default function ProductLittelBox(props, navigation) {
         </View>
         <View>
           <Image
-            source={require('../../assets/images/Other/food.jpg')}
+            source={{uri: 'data:image/jpeg;base64,' + item.image}}
             style={styles.imageContainer}
           />
         </View>
@@ -41,7 +115,21 @@ export default function ProductLittelBox(props, navigation) {
           <Text style={styles.compositionsStyle}>{item.compositions}</Text>
           <Text style={styles.priceStyle}>${item.price}</Text>
         </View>
-        <TouchableOpacity style={styles.buttonnext}>
+        <TouchableOpacity
+          style={styles.buttonnext}
+          onPress={() => {
+            Gonext(
+              item.id,
+              item.calories,
+              item.filter,
+              item.name,
+              item.image,
+              item.description,
+              item.price,
+              item.favorite,
+              item.composition,
+            );
+          }}>
           <FontAwesomeIcon
             icon={faAngleRight}
             size={25}
@@ -52,106 +140,48 @@ export default function ProductLittelBox(props, navigation) {
     );
   };
   {
-    /*const [search, setSearch] = useState('');
-  const [filteredDataSource, setFilteredDataSource] = useState([]);
-  const [masterDataSource, setMasterDataSource] = useState([]);
-
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-      .then((response) => response.json())
-      .then((responseJson) => { 
-        setFilteredDataSource(responseJson);
-        setMasterDataSource(responseJson);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
-
-  const searchFilterFunction = (text) => {
-    // Check if searched text is not blank
-    if (text) {
-      // Inserted text is not blank
-      // Filter the masterDataSource
-      // Update FilteredDataSource
-      const newData = masterDataSource.filter(
-        function (item) {
-          const itemData = item.title
-            ? item.title.toUpperCase()
-            : ''.toUpperCase();
-          const textData = text.toUpperCase();
-          return itemData.indexOf(textData) > -1;
-      });
-      setFilteredDataSource(newData);
-      setSearch(text);
-    } else {
-      // Inserted text is blank
-      // Update FilteredDataSource with masterDataSource
-      setFilteredDataSource(masterDataSource);
-      setSearch(text);
-    }
-  };
-   const ItemView = ({item}) => {
-    return (
-      // Flat List Item
-      <Text
-        style={styles.itemStyle}
-        onPress={() => getItem(item)}>
-        {item.id}
-        {'.'}
-        {item.title.toUpperCase()}
-      </Text>
-    );
-  };
-
-  
-  const getItem = (item) => {
-    // Function for click on an item
-    alert('Id : ' + item.id + ' Title : ' + item.title);
-  };*/
   }
   return (
     <>
-      <TextInput placeholder="Search Here" style={styles.textInputStyle} />
+      <TextInput
+        placeholder="Search type or name food"
+        style={styles.textInputStyle}
+        autoCapitalize="true"
+        onEndEditing={() => Search()}
+        onChangeText={value => {
+          setSearchFood(value);
+        }}
+      />
+      <View style={styles.groupTitelPage}>
+        <Text style={styles.TitelPageFood}>Search </Text>
+        <Text style={styles.TitelPage}>Food {listFood.length} Resulth </Text>
+      </View>
       <View style={styles.flatListContainer}>
         <FlatList
-          data={categoryFoodList}
+          data={listFood}
           renderItem={renderCategoryFoodList}
           keyExtractor={item => item.id}
           numColumns={2}
+          showsVerticalScrollIndicator={false}
         />
       </View>
     </>
-    /* <SafeAreaView style={{flex: 1}}>
-      <View style={styles.container}>
-        <TextInput
-          style={styles.textInputStyle}
-          onChangeText={(text) => searchFilterFunction(text)}
-          value={search}
-          underlineColorAndroid="transparent"
-          placeholder="Search Here"
-        />
-        <FlatList
-          data={filteredDataSource}
-          keyExtractor={(item, index) => index.toString()}
-          ItemSeparatorComponent={ItemSeparatorView}
-          renderItem={ItemView}
-        />
-      </View>
-    </SafeAreaView>*/
   );
 }
 
 const styles = StyleSheet.create({
   flatListContainer: {
-    paddingBottom: 300,
+    height: responsiveHeight(65),
   },
   containerFoodList: {
     width: responsiveWidth(48),
     height: responsiveHeight(40),
     marginBottom: responsiveWidth(5),
+    marginLeft: responsiveWidth(1),
     backgroundColor: '#FAFBFD',
     borderRadius: 15,
+    shadowColor: '#0009',
+    elevation: 5,
   },
   caloriesLike: {
     width: responsiveWidth(45),
@@ -207,11 +237,7 @@ const styles = StyleSheet.create({
     borderColor: '#272727',
     backgroundColor: '#FFFFFF',
   },
-  imageContainer: {
-    width: responsiveWidth(3),
-    height: responsiveHeight(2),
-    marginRight: responsiveWidth(1.5),
-  },
+
   nameStyle: {
     fontFamily: 'Gilroy-Regular',
     color: '#272727',
@@ -228,5 +254,18 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(2.5),
     marginTop: responsiveHeight(2),
   },
+  groupTitelPage: {
+    marginLeft: responsiveWidth(6),
+    marginTop: responsiveHeight(2),
+  },
+  TitelPage: {
+    fontFamily: 'Gilroy-Medium',
+    fontSize: responsiveFontSize(4),
+    color: '#2F2F2F',
+  },
+  TitelPageFood: {
+    fontFamily: 'Gilroy-Light',
+    fontSize: responsiveFontSize(4),
+    color: '#2F2F2F',
+  },
 });
- 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -16,32 +16,73 @@ import {
 } from 'react-native-responsive-dimensions';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSearch, faAngleRight} from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 import CategoryProductBox from './CategoryProductBox.js';
 import SubMenue from './SubMenue.js';
-export default function CategoriesBottomMenue() {
+
+export default function CategoriesBottomMenue(props, navigation) {
+  const {filter, id} = props.route.params;
+  const [listfood, setlistfood] = useState(null);
+  const filterfood = async state => {
+    try {
+      const res = await axios
+        .post('http://192.168.43.121/api/Food/FilterFood', state)
+        .then(res => res.data)
+        .then(data => {
+          setlistfood(data);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const Submit = () => {
+    Click();
+  };
+  const Click = () => {
+    const state = {
+      filter: filter,
+    };
+    filterfood(state);
+  };
+
   return (
     <SafeAreaView style={styles.categorypage}>
-      <TouchableOpacity style={styles.flashback}>
+      <TouchableOpacity
+        style={styles.flashback}
+        onPress={() => props.navigation.goBack()}>
         <Image source={require('../../assets/images/Other/Flash.png')} />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.searchbox}>
-        <FontAwesomeIcon
-          icon={faSearch}
-          size={22}
-          color="#9D9D9D"
-          style={{alignSelf: 'center'}}
-        />
-      </TouchableOpacity>
+      </TouchableOpacity> 
+
       <View style={styles.groupTitelPage}>
         <Text style={styles.TitelPageFood}>Category </Text>
-        <Text style={styles.TitelPage}>Pasta</Text>
+        <Text style={styles.TitelPage}>{filter}</Text>
+      </View> 
+      <View style={styles.product}>
+        <CategoryProductBox
+          Func={() => Submit()}
+          FoodList={listfood}
+          nv={props.navigation}
+          id={id}
+        />
       </View>
-      <CategoryProductBox />
-      <SubMenue />
+      <SubMenue
+        search={() => {
+          props.navigation.navigate('Search');
+        }}
+        home={() => {
+          props.navigation.navigate('Special');
+        }}
+        Favorites={() => {
+          props.navigation.navigate('Favorites', {id: id});
+        }}
+      />
     </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
+  product: {
+    marginLeft: responsiveHeight(2),
+  },
   categorypage: {
     flex: 1,
     backgroundColor: 'white',
