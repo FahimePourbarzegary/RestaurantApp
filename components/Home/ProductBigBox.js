@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
   calories: {
     fontFamily: 'Gilroy-Medium',
     fontSize: responsiveFontSize(1.8),
+    color:"#9C9C9C",
   },
   foodDetail: {
     marginLeft: responsiveWidth(3),
@@ -234,6 +235,11 @@ const styles = StyleSheet.create({
     color: '#313131',
     fontSize: responsiveFontSize(2.5),
     marginTop: responsiveHeight(2),
+  },
+  nameStyle: {
+    fontFamily: 'Gilroy-Regular',
+    color: '#272727', 
+    fontSize: responsiveFontSize(2.5),
   },
 });
 const mapStateToProps = state => ({

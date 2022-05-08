@@ -19,7 +19,7 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSearch} from '@fortawesome/free-solid-svg-icons';
 import ButtonShop from '../Button/ItemShopButton.js';
-import categoriesNavData from '../../assets/data/Specialdata/categoriesNavData.js';
+
 import CoInfoAddress from './CoInfoAddress.js';
 import ProductBigBox from './ProductBigBox.js';
 //Redux
@@ -82,7 +82,31 @@ function Special(props, {navigation}) {
       </View>
     );
   }
-  console.log('Token' + Token);
+ const categoriesNavData=[
+   {
+     id:1,
+     categoryName:"All Menu"
+ },{
+   id:2,
+   categoryName:"Pizza"
+ },
+ {
+   id:3,
+   categoryName:"Food"
+ },
+ {
+   id:4,
+   categoryName:"Popular"
+ },
+ {
+   id:5,
+   categoryName:"Drink"
+ },
+ {
+   id:6,
+   categoryName:"Top"
+ },
+ ];
   const renderCategoryItem = categoriesNavData.map(item => (
     <View>
       <TouchableOpacity

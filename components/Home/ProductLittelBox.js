@@ -112,7 +112,7 @@ export default function ProductLittelBox(props, navigation) {
         </View>
         <View style={styles.foodDetail}>
           <Text style={styles.nameStyle}>{item.name}</Text>
-          <Text style={styles.compositionsStyle}>{item.compositions}</Text>
+          <Text style={styles.compositionsStyle}>{item.composition}</Text>
           <Text style={styles.priceStyle}>${item.price}</Text>
         </View>
         <TouchableOpacity
@@ -145,11 +145,11 @@ export default function ProductLittelBox(props, navigation) {
     <>
       <TextInput
         placeholder="Search type or name food"
+        placeholderTextColor="gray" 
         style={styles.textInputStyle}
-        autoCapitalize="true"
         onEndEditing={() => Search()}
         onChangeText={value => {
-          setSearchFood(value);
+        setSearchFood(value);
         }}
       />
       <View style={styles.groupTitelPage}>
@@ -201,6 +201,7 @@ const styles = StyleSheet.create({
   calories: {
     fontFamily: 'Gilroy-Medium',
     fontSize: responsiveFontSize(1.5),
+      color:"#9C9C9C",
   },
   foodDetail: {
     marginLeft: responsiveWidth(3),
@@ -236,11 +237,12 @@ const styles = StyleSheet.create({
     margin: 5,
     borderColor: '#272727',
     backgroundColor: '#FFFFFF',
+    color:"black",
   },
 
   nameStyle: {
     fontFamily: 'Gilroy-Regular',
-    color: '#272727',
+    color: '#272727', 
     fontSize: responsiveFontSize(2.5),
   },
   compositionsStyle: {

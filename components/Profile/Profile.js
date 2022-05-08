@@ -17,7 +17,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import Button from '../Button/Button.js';
 import LinearGradient from 'react-native-linear-gradient';
-//.. 
+//..  
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 //..
@@ -206,7 +206,7 @@ function Profile(props, {navigation}, route) {
         </TouchableOpacity>
         <View
           style={{width: responsiveWidth(95), height: responsiveHeight(55)}}>
-          <ScrollView>
+          <ScrollView showsVerticalScrollIndicator={false}>
             <View style={{paddingBottom: responsiveHeight(10)}}>
               {renderProfiledetail}
             </View>
@@ -288,6 +288,8 @@ const styles = StyleSheet.create({
     marginBottom: responsiveHeight(1.5),
     backgroundColor: '#FAFBFD',
     borderRadius: 20,
+    shadowColor: '#0009',
+    elevation: 5,
   },
   inputIcon: {
     position: 'absolute',

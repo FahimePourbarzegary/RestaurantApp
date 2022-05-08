@@ -30,8 +30,11 @@ function SignUp(props, {navigation}) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userData, setDataUser] = useState([]);
   const [ImageUri, setImageUri] = useState(null);
+  const [nameValidError, setNameValidError] = useState('');
+  const [emailValidError, setEmailValidError] = useState('');
+  const [phonenumberValidError, setPhonenumberValidError] = useState('');
+  const [PassValidError, setPassValidError] = useState('');
   //const [Blob, setBlob] = useState(null);
   const OnSelect = data => {
     setImageUri(data);
@@ -44,7 +47,7 @@ function SignUp(props, {navigation}) {
         .post('http://192.168.43.121/api/User/insertUser', state)
         .then(res => res.data)
         .then(data => {
-          console.log(data);
+          console.log(data); 
           if (data == 1) {
             Alert.alert('username has already exist');
           } else if (data == 2) {
@@ -54,6 +57,7 @@ function SignUp(props, {navigation}) {
           }
         });
     } catch (e) {
+      Alert.alert("Check Your input again somthing Wrong or check your internet connection");
       console.log(e);
     }
   };
@@ -66,12 +70,66 @@ function SignUp(props, {navigation}) {
       email: email,
       phonenumber: phoneNumber,
       password: password,
-      image: userData.image,
+      image: ImageUri,
       address: 'Edit your Address',
     };
 
     InsertUser(state);
   };
+  const CheckValidEmail=(val)=>{
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+
+if (val.length === 0) {
+  setEmailValidError(false);
+} else if (reg.test(val) === false) {
+  setEmailValidError(false);
+} else if (reg.test(val) === true) {
+  setEmailValidError(true);
+}
+  }
+  const CheckValidPhonenumber=(val)=>{
+    if (typeof val !== "undefined") {
+  var pattern = new RegExp(/^[0-9\b]+$/);
+  if (!pattern.test(val)) {
+    setPhonenumberValidError(false);
+    
+  }else{
+    setPhonenumberValidError(true);
+  }
+  if(val.length != 11){
+      setPhonenumberValidError(false);
+  }
+}else{
+   setPhonenumberValidError(false);
+} }
+const CheckPass=(val)=>{
+  if(val.length>8 || val.length<5){
+    setPassValidError(false);
+  }else{
+      setPassValidError(true);
+  }
+}
+const ChecknameValid=(val)=>{
+  if(val.length>15||val.length<3){
+    setNameValidError(false);
+  }else{
+     setNameValidError(true);
+  }
+}
+const SignUptoapp=()=>{
+  if(!nameValidError){
+    Alert.alert("Your username is invalid must in range 3-15");
+  }else if(!phonenumberValidError){
+    Alert.alert("Your phone number is invalid");
+  }else if(!PassValidError){
+     Alert.alert("Your Password must in range 5-8");
+  }else if(!emailValidError){
+     Alert.alert("Your email is invalid");
+  }else{
+    Submit();
+  }
+}
+
   return (
     <View>
       <View>
@@ -112,34 +170,35 @@ function SignUp(props, {navigation}) {
           <TextInput
             style={styles.input}
             placeholder="Username"
-            onChangeText={val => setUserName(val)}></TextInput>
+            onChangeText={val => {setUserName(val);ChecknameValid(val);}}
+            placeholderTextColor="gray"
+            autoCapitalize='none'></TextInput>
           <TextInput
             style={styles.input}
             placeholder="Email"
-            onChangeText={val => setEmail(val)}></TextInput>
+            onChangeText={val => {setEmail(val);CheckValidEmail(val);}}
+            placeholderTextColor="gray"
+             textContentType="emailAddress"
+             keyboardType="email-address"></TextInput>
           <TextInput
             style={styles.input}
             placeholder="Phone Number"
-            onChangeText={val => setPhoneNumber(val)}></TextInput>
+            onChangeText={val => {setPhoneNumber(val);CheckValidPhonenumber(val);}}
+            placeholderTextColor="gray"
+            keyboardType="phone-pad"
+            ></TextInput>
           <TextInput
             style={styles.input}
             placeholder="Password"
-            onChangeText={val => setPassword(val)}></TextInput>
+            onChangeText={val => {setPassword(val);CheckPass(val)}}
+            placeholderTextColor="gray"></TextInput>
         </View>
-        <Button Text="Login to app" nav={() => Submit()} />
-        <View style={{flexDirection: 'row'}}>
-          <Text style={styles.Signup}>I have account.</Text>
-          <TouchableOpacity
-            onPress={() => {
-              Submit();
-            }}>
-            <Text style={styles.Sign}>Login</Text>
-          </TouchableOpacity>
-        </View>
+        <Button Text="SignUp to app" nav={() => {SignUptoapp();}} />
+        <View style={{flexDirection: 'row'}}></View>
       </LinearGradient>
     </View>
-  ); 
-} 
+  );
+}
 const styles = StyleSheet.create({
   Bg: {
     width: responsiveWidth(100),
@@ -165,13 +224,13 @@ const styles = StyleSheet.create({
   inputImageIcon: {
     position: 'absolute',
     backgroundColor: '#FFFFFF',
-    width: responsiveWidth(10),
-    height: responsiveWidth(10),
+    width: responsiveWidth(11),
+    height: responsiveWidth(11),
     borderRadius: 100 / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: responsiveHeight(32),
     marginTop: responsiveHeight(-3),
+    marginLeft: responsiveWidth(60),
   },
   TextContainer: {
     width: responsiveWidth(25),
@@ -199,7 +258,7 @@ const styles = StyleSheet.create({
   input: {
     marginTop: responsiveHeight(1),
     width: responsiveWidth(85),
-    backgroundColor: '#FAFBFD',
+    backgroundColor: '#F0F0F0',
     height: responsiveWidth(18),
     borderRadius: 60,
     fontFamily: 'Gilroy-Medium',

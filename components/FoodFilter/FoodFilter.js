@@ -68,9 +68,6 @@ export default function FoodFilter(props, {navigation}) {
   return (
     <SafeAreaView style={styles.filterfood}>
       <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity style={styles.clear}>
-          <Text style={styles.clearText}>Clear All</Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={styles.close}
           onPress={() => props.navigation.goBack()}>
@@ -131,7 +128,7 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(2),
   },
   close: {
-    marginLeft: responsiveWidth(65),
+    marginLeft: responsiveWidth(85),
     marginTop: responsiveHeight(4),
     justifyContent: 'center',
     alingItem: 'center',

@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  Alert
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faSignInAlt} from '@fortawesome/free-solid-svg-icons';
@@ -41,7 +42,7 @@ function Login(props, {navigation}) {
         .then(value => {
           setUserData(value);
         })
-        .catch(err => console.log(err));
+        .catch(err =>{console.log(err);});
     } catch (e) {
       console.log(e);
     }
@@ -91,6 +92,8 @@ function Login(props, {navigation}) {
         });
     } catch (e) {
       console.log(e);
+            Alert.alert("Network Error"); 
+
     }
   };
 
@@ -137,6 +140,8 @@ function Login(props, {navigation}) {
                 setUserName(value);
               }}
               placeholder="Username"
+              placeholderTextColor="gray" 
+              autoCapitalize='none'
             />
             {styleAuthU ? (
               styleAuthC ? (
@@ -167,6 +172,7 @@ function Login(props, {navigation}) {
               }}
               placeholder="Password"
               secureTextEntry={true}
+              placeholderTextColor="gray" 
             />
             {styleAuthP ? (
               styleAuthC ? (
@@ -205,7 +211,7 @@ function Login(props, {navigation}) {
             onPress={() => {
               props.navigation.navigate('SignUp');
             }}>
-            <Text style={styles.sign}>Sign</Text>
+            <Text style={styles.sign}>SignUp</Text>
           </TouchableOpacity>
         </View>
         <View style={{flexDirection: 'row'}}>
@@ -285,13 +291,14 @@ const styles = StyleSheet.create({
   input: {
     marginTop: responsiveHeight(3),
     width: responsiveWidth(85),
-    backgroundColor: '#FAFBFD',
+    backgroundColor: '#F0F0F0',
     height: responsiveWidth(18),
     borderRadius: 60,
     paddingHorizontal: 25,
     fontFamily: 'Gilroy-Medium',
     fontSize: responsiveFontSize(2.5),
     color: '#B0B0B0',
+    
   },
   Signup: {
     marginTop: responsiveHeight(2),

@@ -77,6 +77,9 @@ export default function ChangePassword(props, {navigation}) {
   const tickClick = () => {
     if (reNewPassword != newPassword) {
       setStyleAuthP(false);
+    }else if (newPassword.length>8||newPassword.length<5 ){
+       setStyleAuthP(false);
+          Alert.alert("Your username is invalid must in range 5-8");
     } else {
       setStyleAuthP(true);
     }
@@ -139,7 +142,9 @@ export default function ChangePassword(props, {navigation}) {
             ]}
             placeholder="Old Password"
             onChangeText={val => setOldPassword(val)}
-            onEndEditing={() => tickClickOldPas()}></TextInput>
+            onEndEditing={() => tickClickOldPas()}
+            placeholderTextColor="gray" 
+            ></TextInput>
         </View>
         <View style={{marginTop: responsiveHeight(2)}}></View>
         <View style={styles.text}>
@@ -153,7 +158,9 @@ export default function ChangePassword(props, {navigation}) {
             ]}
             placeholder="Enter New Password"
             secureTextEntry={true}
-            onChangeText={val => setNewPassword(val)}></TextInput>
+            onChangeText={val => setNewPassword(val)}
+            placeholderTextColor="gray" 
+            ></TextInput>
           <TextInput
             style={[
               styles.input,
@@ -162,7 +169,9 @@ export default function ChangePassword(props, {navigation}) {
             placeholder="Re Enter New Password"
             onChangeText={val => setReNewPassword(val)}
             secureTextEntry={true}
-            onEndEditing={() => tickClick()}></TextInput>
+            onEndEditing={() => tickClick()}
+            placeholderTextColor="gray" 
+            ></TextInput>
         </View>
 
         <Button Text="Save" nav={() => SaveClick()} />
@@ -226,7 +235,7 @@ const styles = StyleSheet.create({
   input: {
     marginTop: responsiveHeight(1.5),
     width: responsiveWidth(85),
-    backgroundColor: '#FAFBFD',
+    backgroundColor: '#F0F0F0',
     height: responsiveWidth(18),
     borderColor: '#DED7D7',
     borderWidth: 0.5,

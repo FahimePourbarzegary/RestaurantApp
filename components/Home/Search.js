@@ -52,7 +52,9 @@ export default function Search(props, {navigation}) {
  
       <ProductLittelBox id={userData.id} navigation={props.navigation} />
       <View style={{position: 'absolute', bottom: 30}}>
-        <ButtonShop />
+        <ButtonShop nav={() => {
+            props.navigation.navigate('MyCard', {id: userData.id});
+          }}/>
       </View>
     </SafeAreaView>
   );

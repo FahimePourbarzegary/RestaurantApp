@@ -12,7 +12,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 export default function Imagepicker(props, {navigation}, route) {
   const {nav} = props.route.params;
   const [ImageUri, setImageUri] = useState('');
-  const [btob, setbtob] = useState('');
+  const [btob, setbtob] = useState(''); 
   const goBack = () => {
     props.navigation.goBack();
     props.route.params.OnSelect(ImageUri);

@@ -88,7 +88,7 @@ export default function CategoryProductBox(props) {
           </View>
           <View style={styles.foodDetail}>
             <Text style={styles.nameStyleText}>{item.name}</Text>
-            <Text style={styles.compositionsText}>{item.compositions}</Text>
+            <Text style={styles.compositionsText}>{item.composition}</Text>
             <Text style={styles.priceText}>${item.price}</Text>
           </View>
           <TouchableOpacity
@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
   calories: {
     fontFamily: 'Gilroy-Medium',
     fontSize: responsiveFontSize(1.3),
+      color:"#9C9C9C",
   },
   imageContainer: {
     marginLeft: responsiveWidth(3),

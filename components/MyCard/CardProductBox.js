@@ -41,18 +41,6 @@ export default function CardProductBox(props, {navigation}) {
     deleteCardbyid(state);
   };
 
-  const closeRow = (rowMap, rowKey) => {
-    if (rowMap[rowKey]) {
-      rowMap[rowKey].closeRow();
-    }
-  };
-  const deleteRow = (rowMap, rowKey) => {
-    closeRow(rowMap, rowKey);
-    const newData = [...props.FoodData];
-    const prevIndex = listData.findIndex(item => item.key === rowKey);
-    newData.splice(prevIndex, 1);
-    setFoodData(newData);
-  };
   const renderHiddenItem = (data, rowMap) => {
     console.log(data);
     return (
@@ -97,7 +85,9 @@ const renderCardProducts = ({item}) => {
     <View style={styles.ContainerCategoryBox}>
       <View style={{flexDirection: 'row'}}>
         <View></View>
-
+        <View>
+      
+        </View>
         <View style={styles.foodDetail}>
           <Text style={styles.nameStyleText}>
             {item.name}

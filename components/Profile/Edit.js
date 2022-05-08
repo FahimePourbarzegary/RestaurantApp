@@ -6,7 +6,11 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
+  LogBox,
+  Alert, 
 } from 'react-native';
+LogBox.ignoreLogs(['Warning: ...']); 
+LogBox.ignoreAllLogs();
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import {
@@ -18,11 +22,79 @@ import Button from '../Button/Button.js';
 import LinearGradient from 'react-native-linear-gradient';
 export default function Edit(props, navigation, route) {
   const {title, text, type} = props.route.params;
-  const [TextEdit, setTextEdit] = useState('');
+  const [TextEdit, setTextEdit] = useState(''); 
+  const [nameValidError, setNameValidError] = useState('');
+  const [emailValidError, setEmailValidError] = useState('');
+  const [phonenumberValidError, setPhonenumberValidError] = useState('');
   const submit = () => {
     props.route.params.EditText(TextEdit, type);
     props.navigation.goBack();
   };
+   const CheckValidEmail=(val)=>{
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+
+if (val.length === 0) {
+  setEmailValidError(false);
+} else if (reg.test(val) === false) {
+  setEmailValidError(false);
+} else if (reg.test(val) === true) {
+  setEmailValidError(true);
+}
+  }
+  const CheckValidPhonenumber=(val)=>{
+    if (typeof val !== "undefined") {
+  var pattern = new RegExp(/^[0-9\b]+$/);
+  if (!pattern.test(val)) {
+    setPhonenumberValidError(false);
+    
+  }else{
+    setPhonenumberValidError(true);
+  }
+  if(val.length != 11){
+      setPhonenumberValidError(false);
+  }
+}else{
+   setPhonenumberValidError(false);
+} 
+}
+const ChecknameValid=(val)=>{
+  if(val.length>15||val.length<3){
+    setNameValidError(false);
+  }else{
+     setNameValidError(true);
+  }
+}
+const keytype=()=>{
+ if(type=='phonenumber'){
+   return "phone-pad"
+ }else if(type=="email"){
+   return "email-address"
+ }else{
+   return null
+ }
+}
+const Checktype=(val)=>{
+    if(type=='phonenumber'){
+   return CheckValidPhonenumber(val);
+ }else if(type=="email"){
+   return CheckValidEmail(val);
+ }else if(type=="username"){
+   return ChecknameValid(val);
+ }else{
+   return null
+ }
+}
+const SubmitCheck=()=>{
+  if(type=="email" && !emailValidError){
+    Alert.alert("Your email is invalid");
+  }else if(type=="phonenumber" && !phonenumberValidError){
+     Alert.alert("Your phone number is invalid");
+  }else if(type=="username" && !nameValidError){
+     Alert.alert("Your username is invalid must in range 3-15");
+  }else{
+    submit();
+  }
+}
   return (
     <View>
       <View>
@@ -55,15 +127,18 @@ export default function Edit(props, navigation, route) {
         <View style={styles.textInputeContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Edit"
-            onChangeText={val => setTextEdit(val)}>
-            {text}
+            placeholder={text}
+            onChangeText={val => {setTextEdit(val);Checktype(val);}}
+            keyboardType={keytype()}
+             placeholderTextColor="gray"
+            >
+            
           </TextInput>
         </View>
         <Button
           Text="Edit"
           nav={() => {
-            submit();
+            SubmitCheck();
           }}
         />
       </LinearGradient>
@@ -125,7 +200,7 @@ const styles = StyleSheet.create({
   input: {
     marginTop: responsiveHeight(1),
     width: responsiveWidth(85),
-    backgroundColor: '#FAFBFD',
+    backgroundColor: '#F0F0F0',
     height: responsiveWidth(18),
     paddingHorizontal: 25,
     borderRadius: 60,

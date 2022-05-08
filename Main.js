@@ -1,6 +1,5 @@
 import App from "./App";
 //Redux
-import AuthContext from './components/authContext/context.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { applyMiddleware,createStore } from 'redux';
 import { Provider } from 'react-redux';
@@ -24,7 +23,7 @@ const persistStore = storeToPersist =>
 			resolve();
 		});
 	});
-import {autoLogin} from './Action/userActions'
+
 import {connect} from 'react-redux'
 //... 
 import { View, Text } from 'react-native';

@@ -52,7 +52,8 @@ export default function ForgotPassword(props, {navigation}) {
           <TextInput
             style={styles.input}
             placeholder="Phone Number"
-            onChangeText={val => setPhoneNumber(val)}></TextInput>
+            onChangeText={val => setPhoneNumber(val)}
+              placeholderTextColor="gray" ></TextInput>
         </View>
         <Button
           Text="Next App"
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   input: {
     marginTop: responsiveHeight(1),
     width: responsiveWidth(85),
-    backgroundColor: '#FAFBFD',
+     backgroundColor: '#F0F0F0',
     height: responsiveWidth(18),
     paddingHorizontal: 25,
     borderRadius: 60,

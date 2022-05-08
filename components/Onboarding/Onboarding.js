@@ -52,6 +52,7 @@ function Onboarding(props, {navigation}) {
         onPress={() => {
           if (index === 2) {
             props.navigation.navigate('Difdish');
+            setIndex(index=>0);
           } else {
             console.log(index);
             setIndex(index => index + 1);
